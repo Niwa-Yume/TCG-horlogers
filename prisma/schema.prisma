@@ -98,6 +98,7 @@ model User {
   bids          Bid[]
   tradesOut     Trade[]        @relation("tradeFrom")
   tradesIn      Trade[]        @relation("tradeTo")
+  notifications Notification[]
 
   @@unique([provider, providerId])
 }
@@ -221,4 +222,26 @@ model Match {
   seed      String
   log       Json
   createdAt DateTime @default(now())
+}
+
+/// Avis au joueur (surenchéri, échange reçu, vente conclue…), écrit dans la même transaction que l'événement.
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  kind      String // OUTBID | AUCTION_WON | AUCTION_SOLD | AUCTION_EXPIRED | TRADE_RECEIVED | TRADE_ACCEPTED | TRADE_DECLINED | TRADE_CANCELLED | TRADE_EXPIRED
+  data      Json // { cardId?, amount?, net?, from? } : rendu dans la langue du joueur à la lecture
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+}
+
+/// Limite d'actions par minute, partagée par tous les processus API (fenêtre fixe d'une minute).
+model ActionCount {
+  key    String
+  window DateTime
+  count  Int
+
+  @@id([key, window])
 }
