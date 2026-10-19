@@ -1,38 +1,174 @@
 {
-  "_doc": "Fiche des planches : repères historiques et plage de dates valide. L'admin refuse une carte dont l'année du cadran sort de la plage.",
-  "londres-tamise": {
-    "script": "scene_londres2.py",
-    "technique": "GRAVURE",
-    "from": 1711,
-    "to": 1799,
-    "landmarks": ["Dôme de Saint-Paul (achevé en 1711)", "Flèches de Wren", "Trois-mâts de la Compagnie des Indes", "Costumes du XVIIIe siècle"]
-  },
+  "_doc": "Fiche des planches : repères historiques et plage de dates valide. L'admin refuse une carte dont l'année du cadran sort de la plage ; l'ingestion bascule alors sur l'établi. Les cinq premières sont les planches des cadrans de référence (scripts scene_*.py) ; les suivantes sont la bibliothèque générique de plates.py, rendue dans les cinq techniques.",
   "en-mer": {
-    "script": "scene_mer.py",
-    "technique": "MARQUETERIE",
-    "from": 1700,
-    "to": 1850,
-    "landmarks": ["Vaisseau à voiles carrées", "Aucun vapeur"]
+    "script": "plates.py",
+    "from": 1650,
+    "to": 2100,
+    "landmarks": [
+      "Vaisseau sous voiles avant 1860, vapeur ensuite",
+      "Goélands"
+    ]
   },
   "paris-notre-dame-nuit": {
     "script": "scene_paris_nuit.py",
     "technique": "GRISAILLE",
     "from": 1792,
     "to": 1858,
-    "landmarks": ["Notre-Dame sans flèche (déposée en 1792, rebâtie en 1859)", "Maisons de quai"]
+    "landmarks": [
+      "Notre-Dame sans flèche (déposée en 1792, rebâtie en 1859)",
+      "Maisons de quai"
+    ]
   },
   "londres-fleet-street": {
     "script": "scene_londres_nuit.py",
     "technique": "CLOISONNE",
     "from": 1711,
     "to": 1799,
-    "landmarks": ["Flèche de St Bride (1703)", "Dôme de Saint-Paul (1711)", "Boutique de Thomas Mudge"]
+    "landmarks": [
+      "Flèche de St Bride (1703)",
+      "Dôme de Saint-Paul (1711)",
+      "Boutique de Thomas Mudge"
+    ]
   },
   "paris-quai-horloge": {
     "script": "scene_paris_soir.py",
     "technique": "GRAND_FEU",
     "from": 1788,
     "to": 1857,
-    "landmarks": ["Pont au Change sans maisons (démolies en 1788, pont reconstruit en 1858)", "Tour de l'Horloge", "Tours de la Conciergerie", "Bateau-lavoir"]
+    "landmarks": [
+      "Pont au Change sans maisons (démolies en 1788, pont reconstruit en 1858)",
+      "Tour de l'Horloge",
+      "Tours de la Conciergerie",
+      "Bateau-lavoir"
+    ]
+  },
+  "paris-cite": {
+    "script": "plates.py",
+    "from": 1700,
+    "to": 2100,
+    "landmarks": [
+      "Notre-Dame : flèche avant 1786, sans flèche de 1792 à 1859, flèche de Viollet-le-Duc ensuite (brûlée en 2019, rebâtie en 2024)",
+      "Maisons de quai",
+      "Vapeurs sur la Seine après 1860"
+    ]
+  },
+  "geneve-rade": {
+    "script": "plates.py",
+    "from": 1700,
+    "to": 2100,
+    "landmarks": [
+      "Mont-Blanc et Salève",
+      "Tours de Saint-Pierre ; flèche centrale à partir de 1898",
+      "Jet d'eau à partir de 1891",
+      "Vapeurs à aubes dès 1823",
+      "Barques du Léman à voiles latines jusqu'aux années 1930"
+    ]
+  },
+  "vallee-de-joux": {
+    "script": "plates.py",
+    "from": 1700,
+    "to": 2100,
+    "landmarks": [
+      "Dent de Vaulion",
+      "Forêt du Risoux",
+      "Lac de Joux gelé",
+      "Fermes du Jura où l'on travaillait l'horlogerie l'hiver"
+    ]
+  },
+  "chaux-de-fonds": {
+    "script": "plates.py",
+    "from": 1835,
+    "to": 2100,
+    "landmarks": [
+      "Plan en damier (1835)",
+      "Rangées d'immeubles d'horlogers",
+      "Grand Temple : flèche jusqu'à l'incendie de 1919",
+      "Cheminées d'usine après 1850"
+    ]
+  },
+  "le-locle": {
+    "script": "plates.py",
+    "from": 1700,
+    "to": 2100,
+    "landmarks": [
+      "Vallon jurassien (Le Locle, Saint-Imier, Fleurier…)",
+      "Temple et son horloge",
+      "Sapins",
+      "Fabriques après 1870"
+    ]
+  },
+  "neuchatel": {
+    "script": "plates.py",
+    "from": 1700,
+    "to": 2100,
+    "landmarks": [
+      "Lac et chaîne des Alpes",
+      "Château et collégiale",
+      "Observatoire cantonal à partir de 1858"
+    ]
+  },
+  "bienne": {
+    "script": "plates.py",
+    "from": 1700,
+    "to": 2100,
+    "landmarks": [
+      "Première chaîne du Jura",
+      "Vieille ville et tour",
+      "Lac de Bienne",
+      "Fabriques après 1850"
+    ]
+  },
+  "schaffhouse": {
+    "script": "plates.py",
+    "from": 1589,
+    "to": 2100,
+    "landmarks": [
+      "Munot (achevé en 1589)",
+      "Vignes",
+      "Pignons de la vieille ville",
+      "Le Rhin et ses barques"
+    ]
+  },
+  "glashutte": {
+    "script": "plates.py",
+    "from": 1700,
+    "to": 2100,
+    "landmarks": [
+      "Vallée de la Müglitz",
+      "Maisons à colombages",
+      "Église au clocher baroque",
+      "Pont de pierre",
+      "Manufactures après 1845"
+    ]
+  },
+  "etabli": {
+    "script": "plates.py",
+    "from": 1000,
+    "to": 2100,
+    "landmarks": [
+      "Établi et mouvement ; astrolabe avant 1500",
+      "Régulateur mural après 1680",
+      "Chandelle avant 1800, lampe à huile jusqu'en 1900, lampe électrique ensuite"
+    ]
+  },
+  "observatoire": {
+    "script": "plates.py",
+    "from": 1670,
+    "to": 2100,
+    "landmarks": [
+      "Coupole ouverte et lunette (premiers observatoires : Paris 1667, Greenwich 1675)",
+      "Ciel étoilé"
+    ]
+  },
+  "londres-tamise": {
+    "script": "plates.py",
+    "from": 1711,
+    "to": 1950,
+    "landmarks": [
+      "Dôme de Saint-Paul (achevé en 1711)",
+      "Flèches de Wren",
+      "Tamise : voiliers et gabares avant 1860, vapeurs ensuite",
+      "Passants habillés selon l'époque"
+    ]
   }
 }
