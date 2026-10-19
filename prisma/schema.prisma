@@ -1,0 +1,149 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CardType {
+  WATCHMAKER
+  MAISON
+  MODEL
+  INVENTION
+  COMPLICATION
+  EVENT
+}
+
+enum Rarity {
+  GRAVURE
+  MARQUETERIE
+  GRISAILLE
+  CLOISONNE
+  GRAND_FEU
+}
+
+enum CardStatus {
+  ACTIVE
+  RETIRED
+}
+
+model Card {
+  id            String     @id @default(cuid())
+  slug          String     @unique
+  number        Int        @unique // numéro de série au verso (N° 0141)
+  type          CardType
+  wikidataId    String?    @unique
+  nameFr        String
+  nameEn        String
+  captionFr     String? // légende du cadran, avec article : « L'échappement à ancre » (sinon nameFr)
+  captionEn     String?
+  summaryFr     String
+  summaryEn     String
+  anecdoteFr    String? // révélée par la loupe
+  anecdoteEn    String?
+  author        String? // verso : « Thomas Mudge » (inventeur, fondateur, fabricant)
+  year          Int? // verso : année clé (invention, fondation, lancement, naissance)
+  yearEnd       Int? // horloger : année de décès
+  yearCirca     Boolean    @default(false)
+  plate         String? // planche de scène du cadran (tools/dial-painter/plates.json)
+  plateSeed     Int?
+  dialYear      Int? // année de la scène, doit tenir dans la plage de la planche
+  dialPlaceFr   String? // légende ligne 2 : « Londres, vers 1755 »
+  dialPlaceEn   String?
+  dialImage     String? // base du chemin du cadran peint, sans extension : /dials/cadran-londres-1755
+  shareImage    String?
+  rarity        Rarity
+  precision     Int // 1..10
+  complication  Int
+  innovation    Int
+  prestige      Int
+  heritage      Int
+  pageviews     Int        @default(0)
+  isFlagship    Boolean    @default(false)
+  status        CardStatus @default(ACTIVE) // interrupteur d'urgence
+  overrideName  Json? // { fr, en }
+  overrideText  Json? // { fr, en }
+  overrideImage String?
+  sourceUrlFr   String?
+  sourceUrlEn   String?
+  license       String     @default("CC BY-SA 4.0")
+  updatedAt     DateTime   @updatedAt
+  instances     CardInstance[]
+  questions     Question[]
+
+  @@index([status, type, rarity])
+}
+
+model User {
+  id            String         @id @default(cuid())
+  displayName   String
+  provider      String? // google | discord | null pour un invité
+  providerId    String?
+  isGuest       Boolean        @default(true)
+  rubis         Int            @default(0)
+  boosterStock  Int            @default(3)
+  boosterRefill DateTime       @default(now())
+  rating        Int            @default(1000)
+  tutorialDone  Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  cards         CardInstance[]
+  decks         Deck[]
+  ledger        LedgerEntry[]
+
+  @@unique([provider, providerId])
+}
+
+model CardInstance {
+  id         String   @id @default(cuid())
+  cardId     String
+  ownerId    String
+  acquiredAt DateTime @default(now())
+  card       Card     @relation(fields: [cardId], references: [id])
+  owner      User     @relation(fields: [ownerId], references: [id])
+
+  @@index([ownerId, cardId])
+}
+
+model LedgerEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  delta     Int
+  reason    String // RECYCLE | DUEL_WIN | DAILY | ALBUM | AUCTION_BUY | AUCTION_SELL | TAX ...
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Deck {
+  id      String   @id @default(cuid())
+  userId  String
+  name    String
+  cardIds String[] // exactement 10 instances
+  user    User     @relation(fields: [userId], references: [id])
+}
+
+model Question {
+  id          String   @id // déterministe : q_<slug>_<fait>, pour que le seed ne duplique rien
+  cardId      String
+  promptFr    String
+  promptEn    String
+  choicesFr   String[] // 4 choix
+  choicesEn   String[]
+  answerIndex Int
+  source      String // AUTO | MANUAL
+  verified    Boolean  @default(false) // seules les questions vérifiées sont utilisées en V1
+  card        Card     @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@index([verified])
+}
+
+model Match {
+  id        String   @id @default(cuid())
+  playerA   String
+  playerB   String? // null = bot
+  winnerId  String?
+  seed      String
+  log       Json
+  createdAt DateTime @default(now())
+}
