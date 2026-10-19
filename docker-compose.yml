@@ -1,0 +1,55 @@
+# Production sur un VPS : postgres + api + umami + caddy (front statique, cadrans, sons).
+# En développement : `docker compose up -d postgres` suffit (pnpm dev fait le reste).
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: wristmasters
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-wristmasters}
+      POSTGRES_DB: wristmasters
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - 127.0.0.1:5432:5432
+    healthcheck:
+      test: pg_isready -U wristmasters
+      interval: 5s
+      retries: 10
+
+  api:
+    build: { context: ., dockerfile: docker/api.Dockerfile }
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://wristmasters:${POSTGRES_PASSWORD:-wristmasters}@postgres:5432/wristmasters
+      ADMIN_TOKEN: ${ADMIN_TOKEN:?ADMIN_TOKEN manquant}
+      PORT: 3000
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://wristmasters:${POSTGRES_PASSWORD:-wristmasters}@postgres:5432/umami
+      APP_SECRET: ${UMAMI_APP_SECRET:?UMAMI_APP_SECRET manquant}
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  caddy:
+    build: { context: ., dockerfile: docker/web.Dockerfile }
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+      STATS_DOMAIN: ${STATS_DOMAIN:-stats.localhost}
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - caddy_data:/data
+    depends_on: [api, umami]
+
+volumes:
+  pgdata:
+  caddy_data:
