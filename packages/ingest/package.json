@@ -1,0 +1,12 @@
+{
+  "name": "@wm/ingest",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "test": "vitest run",
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": { "@wm/shared": "workspace:*" },
+  "devDependencies": { "tsx": "^4.20.6", "@types/node": "^22.18.0" }
+}
