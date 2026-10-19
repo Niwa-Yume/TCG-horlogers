@@ -30,6 +30,7 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
       DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:-}
+      SELL_DELAY_HOURS: ${PROD_SELL_DELAY_HOURS:-72}
       PORT: 3000
     depends_on:
       postgres: { condition: service_healthy }

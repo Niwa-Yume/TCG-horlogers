@@ -4,8 +4,8 @@ Jeu de cartes à collectionner en ligne, 100 % horlogerie, bilingue FR/EN, mobil
 Le brief complet est dans [`BRIEF_CLAUDE_CODE.md`](BRIEF_CLAUDE_CODE.md), son résumé dans [`CLAUDE.md`](CLAUDE.md),
 les maquettes de référence dans [`design/`](design).
 
-État : **Phase 3 terminée** (duel en direct : moteur pur, Socket.IO, automate, reconnexion, Elo, duel
-d'entraînement). Phase 2 : premier contact sans compte, remontage et sonnerie, boosters et collection, connexion
+État : **Phase 4 terminée** (économie : enchères en Rubis, échanges à double confirmation, protections).
+Phase 3 : duel en direct (moteur pur, Socket.IO, automate, reconnexion, Elo, duel d'entraînement). Phase 2 : premier contact sans compte, remontage et sonnerie, boosters et collection, connexion
 Google/Discord, partage. Phase 1 : design system, catalogue, cartes, loupe, ingestion, questions, admin.
 
 ## Démarrer en local
@@ -29,6 +29,8 @@ pnpm dev                # api :3000 + web :5173
 - Page de partage (Open Graph) : http://localhost:5173/partage/c/tourbillon
 - Duel en direct (5 cartes différentes au moins) : http://localhost:5173/duel
 - Duel d'entraînement (sans compte, sans minuteur) : http://localhost:5173/duel/tutoriel
+- Marché (enchères et échanges, compte requis) : http://localhost:5173/encheres
+- Compte de développement sans OAuth (`DEV_LOGIN=1`, local seulement) : http://localhost:5173/api/auth/dev?name=ada
 - Design system et les cinq raretés : http://localhost:5173/systeme
 - Admin (jeton `ADMIN_TOKEN` du `.env`) : http://localhost:5173/admin
 
@@ -36,7 +38,7 @@ pnpm dev                # api :3000 + web :5173
 
 ```bash
 cp .env.example .env    # puis : DOMAIN, STATS_DOMAIN, PUBLIC_URL, ADMIN_TOKEN, SESSION_SECRET, POSTGRES_PASSWORD,
-                        # UMAMI_APP_SECRET, et si besoin GOOGLE_*, DISCORD_*, VITE_UMAMI_*
+                        # UMAMI_APP_SECRET, et si besoin GOOGLE_*, DISCORD_*, VITE_UMAMI_*, PROD_SELL_DELAY_HOURS (72 par défaut)
 docker compose up -d --build
 docker compose exec api pnpm seed
 ```
@@ -50,7 +52,7 @@ caddy (front statique, cadrans et sons, HTTPS automatique, `/api/*` → api, `ST
 |---|---|
 | `pnpm dev` | API (tsx watch) + front (Vite) |
 | `pnpm test` | Vitest : moteur de duel, automate, Elo, rareté, stats, recharge des boosters, tirage, QCM, overrides, plages de planches |
-| `pnpm --filter @wm/api test:db` | idem + test d'intégration du rattachement invité → compte (base requise) |
+| `pnpm --filter @wm/api test:db` | idem + tests d'intégration (base requise) : rattachement invité → compte, marché (séquestre, taxe, verrous, concurrence, échanges) |
 | `pnpm typecheck` / `pnpm lint` / `pnpm format` | TypeScript strict, ESLint, Prettier |
 | `pnpm ingest` | Wikidata + Wikipédia + consultations → `packages/ingest/data/cards.generated.json` (cache dans `packages/ingest/.cache`) |
 | `pnpm seed` | Upsert des cartes et des QCM ; ne touche ni au statut, ni aux overrides, ni aux questions relues |
@@ -92,7 +94,7 @@ Créer le site dans Umami (`STATS_DOMAIN`), puis renseigner `VITE_UMAMI_WEBSITE_
 
 ```
 apps/web            React + Vite : accueil, remontage, album, catalogue, fiche carte + loupe, design system, admin
-apps/api            NestJS (REST) : cartes, admin, session et connexion, boosters, collection, partage, duel ; seed
+apps/api            NestJS (REST) : cartes, admin, session et connexion, boosters, collection, partage, duel, marché ; seed
                     + Socket.IO sur /api/socket.io : file, parties, minuteurs, automate, reconnexion
 packages/ui         tokens, typo, grille, Marquee, SectionLabel, Counter, Button, Chip, StepTimer, Balance, MuteButton, SoundCaption, gestionnaire de sons
 packages/card-render <Card />, <FluidCard />, <Loupe />, <BoosterBack />, thèmes de rareté, cardSvg() pour resvg
@@ -102,6 +104,11 @@ packages/engine     moteur de duel pur (init, step, viewFor), automate, Elo
 tools/dial-painter  peintre de cadrans (Python), plates.json
 prisma/             schéma et migrations
 ```
+
+## Mesures (fin de Phase 4)
+
+Lighthouse 12, mobile simulé, build de production servi par Caddy, 19 octobre 2026 : `/encheres` 96 en
+performance, 100 en accessibilité, 100 en bonnes pratiques, LCP 2,5 s, CLS 0,062. JavaScript initial : 172 Ko gzip.
 
 ## Mesures (fin de Phase 3)
 
@@ -212,3 +219,30 @@ reste à mesurer sur un téléphone moyen.
   partie en cours.
 - **Duel d'entraînement** : le moteur tourne dans le navigateur, critères imposés, tes cinq cartes phares contre cinq
   Gravures, pas de minuteur. Ouvert à tous, sans compte ; événement Umami `tutorial_duel_finished`.
+
+### Phase 4
+
+- **Enchères** : durée fixe de 24 h ; prix de départ au moins égal à ce que rapporte le recyclage (10 Rubis au moins) ;
+  mise suivante = meilleure mise + 5 % (1 Rubis au moins). **Séquestre** : la mise est retirée tout de suite et
+  rendue à l'enchérisseur battu ; on ne surenchérit pas sur soi-même. À l'échéance, le vendeur touche le prix moins
+  **5 % de taxe brûlée** (arrondie au Rubis supérieur, inscrite au registre en `TAX`, créditée à personne) et la
+  carte change de main. Sans mise, la carte revient au vendeur ; on peut retirer une vente tant qu'il n'y a pas de mise.
+- **Règlement** : un ménage toutes les 30 s dans le processus API, et à chaque lecture du marché (idempotent, sous
+  verrou de ligne). Pas de tâche cron externe.
+- **Échanges à double confirmation** : l'auteur confirme en proposant (1 à 5 cartes de chaque côté), ses cartes sont
+  verrouillées ; le destinataire confirme en acceptant, ses cartes sont vérifiées et tout s'échange dans la même
+  transaction. Les cartes du destinataire ne sont pas verrouillées à la proposition (sinon n'importe qui pourrait
+  bloquer les cartes d'un autre). Expiration à 48 h, 10 échanges en attente au plus par joueur. Cartes seulement,
+  pas de Rubis dans un échange.
+- **Verrous** : `CardInstance.lock` (`auction:<id>` ou `trade:<id>`) pris par une mise à jour conditionnelle
+  (`lock = null`) ; une carte verrouillée ne se vend pas, ne s'échange pas, ne se recycle pas et ne joue pas en duel.
+  Verrous de ligne `SELECT … FOR UPDATE` sur l'enchère, l'échange et les joueurs (dans un ordre fixe) ; un test
+  vérifie que deux mises simultanées au même prix ne passent pas toutes les deux.
+- **Délai avant de vendre** : un invité ne vend, n'enchérit ni n'échange ; un compte peut vendre et échanger
+  72 h après sa connexion (`signedUpAt`, réglable par `SELL_DELAY_HOURS` ; 0 en local).
+- **Limite d'actions** : 30 écritures par minute et par session, 120 par adresse IP (`429`), en mémoire du processus.
+  Les lectures et l'admin ne sont pas limitées.
+- **Connexion de développement** : `/api/auth/dev?name=…` crée un compte sans OAuth pour tester le marché à plusieurs.
+  Active seulement avec `DEV_LOGIN=1` **et** une `PUBLIC_URL` en `http://` ; `docker-compose.yml` ne la transmet pas.
+- **Navigation** : la barre mobile suit la maquette de l'album (Remonter, Album, Duel, Enchères) ; le catalogue est
+  accessible depuis l'album et l'en-tête sur ordinateur.
