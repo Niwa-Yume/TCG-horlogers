@@ -238,6 +238,8 @@ export interface DuelPayload {
 // ---------- Marché (Phase 4) ----------
 
 export const AUCTION_HOURS = 24; // durée fixe
+/** Une mise dans les 5 dernières minutes repousse la fin à 5 minutes : pas de victoire à la dernière seconde. */
+export const AUCTION_EXTEND_MINUTES = 5;
 export const AUCTION_TAX = 0.05; // brûlée à la vente
 export const TRADE_HOURS = 48;
 export const ACTIONS_PER_MINUTE = 30;
@@ -278,4 +280,16 @@ export interface TradeView {
   ask: (CardView & { instanceId: string })[];
   status: 'PENDING' | 'DONE' | 'DECLINED' | 'CANCELLED' | 'EXPIRED';
   expiresAt: string;
+}
+
+export interface NotificationView {
+  id: string;
+  kind: string;
+  /** Nom de la carte dans la langue du joueur, montant, pseudo de l'autre joueur. */
+  card: string | null;
+  amount: number | null;
+  net: number | null;
+  from: string | null;
+  read: boolean;
+  createdAt: string;
 }

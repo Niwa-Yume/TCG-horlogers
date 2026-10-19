@@ -13,7 +13,14 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import type { Card, CardInstance } from '@prisma/client';
-import { nextMinBid, RARITIES, type AuctionView, type Lang, type TradeView } from '@wm/shared';
+import {
+  nextMinBid,
+  RARITIES,
+  type AuctionView,
+  type Lang,
+  type NotificationView,
+  type TradeView,
+} from '@wm/shared';
 import { langOf, toView } from '../card-view';
 import { PrismaService } from '../prisma';
 import { SessionService } from '../session';
@@ -220,5 +227,52 @@ export class MarketController {
     if (action === 'decline') return run(() => closeTrade(this.db, id, tradeId, 'DECLINED'));
     if (action === 'cancel') return run(() => closeTrade(this.db, id, tradeId, 'CANCELLED'));
     throw new HttpException({ statusCode: 404, message: 'unknown' }, 404);
+  }
+
+  // ---------- Notifications ----------
+
+  @Get('notifications/count')
+  async unread(@Req() req: Request) {
+    const me = await this.session.userId(req);
+    return { unread: me ? await this.db.notification.count({ where: { userId: me, readAt: null } }) : 0 };
+  }
+
+  @Get('notifications')
+  async notifications(@Req() req: Request, @Query('lang') l?: string): Promise<NotificationView[]> {
+    const me = await this.userId(req);
+    const rows = await this.db.notification.findMany({
+      where: { userId: me },
+      orderBy: { createdAt: 'desc' },
+      take: 40,
+    });
+    const data = rows.map((n) => n.data as { cardId?: string; amount?: number; net?: number; from?: string });
+    const cards = await this.db.card.findMany({
+      where: { id: { in: data.flatMap((d) => (d.cardId ? [d.cardId] : [])) } },
+    });
+    const lang = langOf(l);
+    return rows.map((n, i) => {
+      const d = data[i]!;
+      const c = cards.find((x) => x.id === d.cardId);
+      return {
+        id: n.id,
+        kind: n.kind,
+        card: c ? toView(c, lang, 0).name : null,
+        amount: d.amount ?? null,
+        net: d.net ?? null,
+        from: d.from ?? null,
+        read: !!n.readAt,
+        createdAt: n.createdAt.toISOString(),
+      };
+    });
+  }
+
+  @Post('notifications/read')
+  async read(@Req() req: Request) {
+    const me = await this.userId(req);
+    await this.db.notification.updateMany({
+      where: { userId: me, readAt: null },
+      data: { readAt: new Date() },
+    });
+    return { unread: 0 };
   }
 }

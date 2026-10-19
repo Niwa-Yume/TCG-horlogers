@@ -40,6 +40,7 @@ describe.skipIf(!process.env.DATABASE_URL)('marché', () => {
     card = (await db.card.findFirstOrThrow({ where: { rarity: 'GRAVURE', status: 'ACTIVE' } })).id;
   });
   afterAll(async () => {
+    await db.notification.deleteMany({ where: { userId: { in: users } } });
     await db.bid.deleteMany({ where: { bidderId: { in: users } } });
     await db.auction.deleteMany({ where: { sellerId: { in: users } } });
     await db.trade.deleteMany({ where: { fromId: { in: users } } });
@@ -91,6 +92,55 @@ describe.skipIf(!process.env.DATABASE_URL)('marché', () => {
     expect(results.sort()).toEqual(['bid-too-low', 'ok']);
     expect((await rubis(x)) + (await rubis(y))).toBe(150);
     expect(await db.bid.count({ where: { auctionId: a.id } })).toBe(1);
+  });
+
+  it('prolongation : une mise dans les 5 dernières minutes repousse la fin', async () => {
+    const seller = await player(0);
+    const x = await player(100);
+    const a = await createAuction(db, seller, await instance(seller), 10);
+    await db.auction.update({ where: { id: a.id }, data: { endsAt: new Date(Date.now() + 30_000) } });
+    const after = await placeBid(db, x, a.id, 10);
+    expect(after.endsAt.getTime()).toBeGreaterThan(Date.now() + 4.9 * 60_000);
+    // loin de la fin, rien ne bouge
+    const b = await createAuction(db, seller, await instance(seller), 10);
+    expect((await placeBid(db, x, b.id, 10)).endsAt).toEqual(b.endsAt);
+  });
+
+  it('notifications : surenchéri, vendu, gagné, échange reçu, accepté', async () => {
+    const seller = await player(0);
+    const [x, y] = [await player(100), await player(100)];
+    const a = await createAuction(db, seller, await instance(seller), 10);
+    await placeBid(db, x, a.id, 10);
+    await placeBid(db, y, a.id, 20);
+    await db.auction.update({ where: { id: a.id }, data: { endsAt: new Date(Date.now() - 1000) } });
+    await sweep(db);
+    const kinds = async (u: string) =>
+      (await db.notification.findMany({ where: { userId: u }, orderBy: { createdAt: 'asc' } })).map(
+        (n) => n.kind,
+      );
+    expect(await kinds(x)).toEqual(['OUTBID']);
+    expect(await kinds(y)).toEqual(['AUCTION_WON']);
+    expect(await kinds(seller)).toEqual(['AUCTION_SOLD']);
+    const sold = await db.notification.findFirstOrThrow({ where: { userId: seller } });
+    expect(sold.data).toMatchObject({ amount: 20, net: 19 });
+
+    const t = await proposeTrade(db, x, y, [await instance(x)], [await instance(y)]);
+    expect(await kinds(y)).toContain('TRADE_RECEIVED');
+    await acceptTrade(db, y, t.id);
+    expect((await kinds(x)).at(-1)).toBe('TRADE_ACCEPTED');
+  });
+
+  it('plusieurs processus règlent en même temps : la vente n’est réglée qu’une fois', async () => {
+    const seller = await player(0);
+    const x = await player(100);
+    const a = await createAuction(db, seller, await instance(seller), 50);
+    await placeBid(db, x, a.id, 50);
+    await db.auction.update({ where: { id: a.id }, data: { endsAt: new Date(Date.now() - 1000) } });
+    const other = new PrismaClient(); // un second processus API
+    await Promise.all([sweep(db), sweep(other), sweep(db)]);
+    await other.$disconnect();
+    expect(await rubis(seller)).toBe(47);
+    expect(await db.notification.count({ where: { userId: seller, kind: 'AUCTION_SOLD' } })).toBe(1);
   });
 
   it('enchère sans mise : la carte revient au vendeur ; annulation possible avant toute mise', async () => {

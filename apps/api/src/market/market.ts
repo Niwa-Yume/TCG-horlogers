@@ -3,6 +3,7 @@
 // et un verrou applicatif sur les exemplaires engagés (CardInstance.lock).
 import type { Prisma, PrismaClient, User } from '@prisma/client';
 import {
+  AUCTION_EXTEND_MINUTES,
   AUCTION_HOURS,
   auctionTax,
   minStartPrice,
@@ -31,6 +32,10 @@ async function lockUsers(tx: Tx, ids: (string | null | undefined)[]) {
   for (const id of [...new Set(ids.filter((x): x is string => !!x))].sort())
     await tx.$queryRaw`SELECT 1 FROM "User" WHERE id = ${id} FOR UPDATE`;
 }
+
+/** Avis au joueur, écrit dans la transaction de l'événement : rien n'est annoncé qui n'a pas eu lieu. */
+const notify = (tx: Tx, userId: string, kind: string, data: Record<string, unknown>) =>
+  tx.notification.create({ data: { userId, kind, data: data as Prisma.InputJsonValue } });
 
 const sellDelayMs = () => Number(process.env.SELL_DELAY_HOURS ?? SELL_DELAY_HOURS) * HOUR;
 
@@ -114,7 +119,17 @@ export async function placeBid(
       });
     }
     await tx.bid.create({ data: { auctionId, bidderId: userId, amount } });
-    return tx.auction.update({ where: { id: auctionId }, data: { bestBid: amount, bestBidder: userId } });
+    const inst = await tx.cardInstance.findUniqueOrThrow({
+      where: { id: a.instanceId },
+      select: { cardId: true },
+    });
+    if (a.bestBidder) await notify(tx, a.bestBidder, 'OUTBID', { auctionId, cardId: inst.cardId, amount });
+    // mise de dernière minute : l'enchère se prolonge, pour que l'enchérisseur battu puisse répondre
+    const extendTo = new Date(now.getTime() + AUCTION_EXTEND_MINUTES * 60_000);
+    return tx.auction.update({
+      where: { id: auctionId },
+      data: { bestBid: amount, bestBidder: userId, ...(a.endsAt < extendTo && { endsAt: extendTo }) },
+    });
   });
 }
 
@@ -142,6 +157,11 @@ async function settle(tx: Tx, auctionId: string, now: Date) {
   if (!a.bestBidder || !a.bestBid) {
     await tx.cardInstance.updateMany({ ...unlock, data: { lock: null } });
     await tx.auction.update({ where: { id: a.id }, data: { status: 'EXPIRED', settledAt: now } });
+    const inst = await tx.cardInstance.findUniqueOrThrow({
+      where: { id: a.instanceId },
+      select: { cardId: true },
+    });
+    await notify(tx, a.sellerId, 'AUCTION_EXPIRED', { auctionId: a.id, cardId: inst.cardId });
     return;
   }
   await lockUsers(tx, [a.sellerId]);
@@ -158,6 +178,17 @@ async function settle(tx: Tx, auctionId: string, now: Date) {
     data: { lock: null, ownerId: a.bestBidder, acquiredAt: now },
   });
   await tx.auction.update({ where: { id: a.id }, data: { status: 'SOLD', settledAt: now } });
+  const inst = await tx.cardInstance.findUniqueOrThrow({
+    where: { id: a.instanceId },
+    select: { cardId: true },
+  });
+  await notify(tx, a.sellerId, 'AUCTION_SOLD', {
+    auctionId: a.id,
+    cardId: inst.cardId,
+    amount: a.bestBid,
+    net: a.bestBid - tax,
+  });
+  await notify(tx, a.bestBidder, 'AUCTION_WON', { auctionId: a.id, cardId: inst.cardId, amount: a.bestBid });
 }
 
 // ---------- Échanges ----------
@@ -203,9 +234,12 @@ export async function proposeTrade(
       data: { lock: `trade:${trade.id}` },
     });
     if (locked.count !== offer.length) throw new MarketError('locked');
+    await notify(tx, toId, 'TRADE_RECEIVED', { tradeId: trade.id, from: await nameOf(tx, fromId) });
     return trade;
   });
 }
+
+const nameOf = async (tx: Tx, id: string) => (await tx.user.findUniqueOrThrow({ where: { id } })).displayName;
 
 async function lockTrade(tx: Tx, id: string) {
   await tx.$queryRaw`SELECT 1 FROM "Trade" WHERE id = ${id} FOR UPDATE`;
@@ -240,6 +274,7 @@ export async function acceptTrade(db: PrismaClient, userId: string, tradeId: str
       where: { id: { in: t.offerIds } },
       data: { ownerId: t.toId, lock: null, acquiredAt: now },
     });
+    await notify(tx, t.fromId, 'TRADE_ACCEPTED', { tradeId: t.id, from: await nameOf(tx, t.toId) });
     return tx.trade.update({ where: { id: t.id }, data: { status: 'DONE', closedAt: now } });
   });
 }
@@ -254,6 +289,12 @@ export async function closeTrade(
     const t = await lockTrade(tx, tradeId);
     if ((how === 'DECLINED' ? t.toId : t.fromId) !== userId) throw new MarketError('not-yours', 403);
     await release(tx, t);
+    // refus : l'auteur est prévenu ; retrait : le destinataire
+    const [to, by] = how === 'DECLINED' ? [t.fromId, t.toId] : [t.toId, t.fromId];
+    await notify(tx, to, how === 'DECLINED' ? 'TRADE_DECLINED' : 'TRADE_CANCELLED', {
+      tradeId: t.id,
+      from: await nameOf(tx, by),
+    });
     return tx.trade.update({ where: { id: t.id }, data: { status: how, closedAt: new Date() } });
   });
 }
@@ -275,6 +316,7 @@ export async function sweep(db: PrismaClient, now = new Date()) {
       if (!t) return;
       await release(tx, t);
       await tx.trade.update({ where: { id }, data: { status: 'EXPIRED', closedAt: now } });
+      await notify(tx, t.fromId, 'TRADE_EXPIRED', { tradeId: id, from: await nameOf(tx, t.toId) });
     });
   return { settled: due.length, expired: stale.length };
 }
