@@ -58,7 +58,7 @@ async function save(file: string, data: unknown) {
 // Q353963 complication · Q2307829 chronomètre de marine · Q3107982 spiral · Q1088223 chronographe.
 // Propriétés : P31 nature, P279 sous-classe, P106 occupation, P452 secteur, P569/P570 naissance/décès,
 // P571 fondation/création, P575 date d'invention, P112 fondateur, P61 inventeur, P176 fabricant,
-// P17 pays, P27 nationalité.
+// P17 pays, P27 nationalité, P937 lieu de travail, P19 lieu de naissance, P159 siège, P740 lieu de fondation.
 
 interface TypeQuery {
   type: CardType;
@@ -67,6 +67,7 @@ interface TypeQuery {
   yearEnd?: string;
   entity?: string; // fondateur, inventeur ou fabricant → « author »
   country?: string;
+  places?: string[]; // lieu de la scène du cadran, par ordre de préférence
 }
 
 export const TYPE_QUERIES: TypeQuery[] = [
@@ -76,6 +77,7 @@ export const TYPE_QUERIES: TypeQuery[] = [
     years: ['P569'],
     yearEnd: 'P570',
     country: 'P27',
+    places: ['P937', 'P19'],
   },
   {
     type: 'MAISON',
@@ -84,6 +86,7 @@ export const TYPE_QUERIES: TypeQuery[] = [
     years: ['P571'],
     entity: 'P112',
     country: 'P17',
+    places: ['P740', 'P159'], // lieu de fondation d'abord : le siège actuel a pu changer (Rolex, Omega…)
   },
   {
     type: 'MODEL',
@@ -127,6 +130,13 @@ export interface Entity {
   entityEn: string | null;
   countryFr: string | null;
   countryEn: string | null;
+  /** Fondateur, inventeur ou fabricant (identifiant Wikidata), pour retrouver un lieu par une autre carte. */
+  entityId: string | null;
+  placeId: string | null;
+  placeFr: string | null;
+  placeEn: string | null;
+  /** D'où vient le lieu : P937 lieu de travail, P19 naissance, P159 siège, P740 fondation. */
+  placeProp: string | null;
 }
 
 interface Snak {
@@ -170,6 +180,8 @@ function yearOf(e: WdEntity, props: string[], pick: (ys: number[]) => number): n
 const firstId = (e: WdEntity, prop?: string) =>
   prop ? (values(e, prop).find((v) => v.id)?.id ?? null) : null;
 
+const placeOf = (e: WdEntity, props: string[] = []) => props.map((p) => firstId(e, p)).find(Boolean) ?? null;
+
 export async function fetchEntities(q: TypeQuery): Promise<Entity[]> {
   const url = 'https://query.wikidata.org/sparql?query=' + encodeURIComponent(sparql(q));
   const data = await getJson<{ results: { bindings: Record<string, { value: string }>[] } }>(
@@ -184,6 +196,7 @@ export async function fetchEntities(q: TypeQuery): Promise<Entity[]> {
   const refs = [...rows.keys()].flatMap((id) => [
     firstId(facts[id] ?? {}, q.entity),
     firstId(facts[id] ?? {}, q.country),
+    placeOf(facts[id] ?? {}, q.places),
   ]);
   const names = await entities(
     refs.filter((r): r is string => r != null),
@@ -202,6 +215,9 @@ export async function fetchEntities(q: TypeQuery): Promise<Entity[]> {
     };
     const [entityFr, entityEn] = pair(ent);
     const [countryFr, countryEn] = pair(cty);
+    const place = placeOf(e, q.places);
+    const placeProp = q.places?.find((p) => firstId(e, p) === place) ?? null;
+    const [placeFr, placeEn] = pair(place);
     return {
       type: q.type,
       wikidataId: id,
@@ -214,6 +230,11 @@ export async function fetchEntities(q: TypeQuery): Promise<Entity[]> {
       entityEn: entityEn ?? null,
       countryFr: countryFr ?? null,
       countryEn: countryEn ?? null,
+      entityId: ent,
+      placeId: placeFr ? place : null,
+      placeFr: placeFr ?? null,
+      placeEn: placeEn ?? null,
+      placeProp: placeFr ? placeProp : null,
     };
   });
 }

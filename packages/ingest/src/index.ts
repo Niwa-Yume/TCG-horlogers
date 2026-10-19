@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { computeStats, raritiesByPageviews, type CardType, type Rarity, type Stats } from '@wm/shared';
 import { fetchEntities, pageviews, sitelinks, summary, TYPE_QUERIES, wikiUrl, type Entity } from './sources';
 import { generateQuestions, type Facts, type GeneratedQuestion } from './questions';
+import { assignDial, type PlateRanges } from './dials';
 
 const ROOT = join(import.meta.dirname, '..');
 const OUT = join(ROOT, 'data', 'cards.generated.json');
@@ -63,6 +64,7 @@ async function main() {
 
   // 2. Résumés et consultations
   const cards: GeneratedCard[] = [];
+  const bySlug = new Map<string, Entity>(); // pour le lieu de la scène du cadran
   const slugs = new Set<string>();
   let i = 0;
   for (const e of seen.values()) {
@@ -81,6 +83,7 @@ async function main() {
       countryFr: e.countryFr,
       countryEn: e.countryEn,
     };
+    bySlug.set(slug, e);
     cards.push({
       slug,
       number: 0,
@@ -171,7 +174,35 @@ async function main() {
     used.add((c.number = next));
   }
 
-  // 6. QCM
+  // 6. Cadrans peints : planche, graine, année et lieu de la scène (les cartes phares gardent les leurs)
+  const ranges = JSON.parse(await readFile(join(ROOT, '..', '..', 'tools', 'dial-painter', 'plates.json'), 'utf8')) as PlateRanges;
+  const byQid = new Map([...bySlug.values()].map((e) => [e.wikidataId, e]));
+  for (const c of cards) {
+    const e = bySlug.get(c.slug);
+    if (c.isFlagship || !e) continue;
+    // un modèle prend le lieu de sa maison, une invention celui de son inventeur s'il est au catalogue
+    const via = e.placeFr ? e : e.entityId ? byQid.get(e.entityId) : undefined;
+    const dial = assignDial(
+      {
+        slug: c.slug,
+        type: c.type,
+        nameFr: c.nameFr,
+        nameEn: c.nameEn,
+        year: c.year,
+        yearEnd: c.yearEnd,
+        placeFr: via?.placeFr ?? null,
+        placeEn: via?.placeEn ?? null,
+        birthplace: via === e && e.placeProp === 'P19',
+        currentSeat: via?.placeProp === 'P159',
+        countryFr: e.countryFr ?? via?.countryFr ?? null,
+        countryEn: e.countryEn ?? via?.countryEn ?? null,
+      },
+      ranges,
+    );
+    Object.assign(c, dial, { dialImage: `/dials/${c.slug}` });
+  }
+
+  // 7. QCM
   const questions = generateQuestions(cards);
   for (const c of cards) c.questions = questions.get(c.slug) ?? [];
 
@@ -183,6 +214,7 @@ async function main() {
       .join(', ');
   console.log(`${cards.length} cartes → ${OUT}\n  ${by('type')}\n  ${by('rarity')}`);
   console.log(`  ${cards.reduce((a, c) => a + c.questions.length, 0)} questions (non vérifiées)`);
+  console.log(`  planches : ${Object.entries(Object.groupBy(cards, (c) => c.plate ?? '—')).map(([p, l]) => `${p} ${l!.length}`).join(', ')}`);
 }
 
 const emptyFacts = (): Facts => ({
