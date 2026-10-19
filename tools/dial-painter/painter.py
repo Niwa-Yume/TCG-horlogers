@@ -11,6 +11,7 @@ larges et souples, les détails reçoivent des touches fines. Suivent la plume
 Pas d'IA, pas d'image source : tout est calculé.
 """
 import math
+from contextlib import contextmanager
 import numpy as np
 from PIL import Image, ImageDraw
 from scipy import ndimage as ndi
@@ -24,6 +25,29 @@ def col3(c):
     return np.full(3, float(c), np.float32) if c.ndim == 0 else c
 
 
+# ───────────────────────────── matières ─────────────────────────────
+# Chaque pixel de la scène garde la matière qui l'a peint en dernier : c'est ce qui permet
+# de rendre une même planche en couleurs (Cloisonné, Grand Feu) à partir d'un modelé en valeurs.
+MATERIALS = ['vide', 'ciel', 'nuage', 'lumiere', 'eau', 'pierre', 'toit', 'bois', 'toile',
+             'feuillage', 'sol', 'neige', 'montagne', 'figure', 'metal', 'vitre', 'brique']
+MAT = {name: i for i, name in enumerate(MATERIALS)}
+_CURRENT = [0]
+
+
+@contextmanager
+def material(name):
+    """Tout ce qui est peint dans ce bloc est marqué de cette matière."""
+    _CURRENT.append(MAT[name])
+    try:
+        yield
+    finally:
+        _CURRENT.pop()
+
+
+def current_material():
+    return _CURRENT[-1]
+
+
 class Scene:
     """Image de référence (1 = clair) + champs qui guident le pinceau."""
 
@@ -34,6 +58,7 @@ class Scene:
         self.lenm = np.ones((H, W), np.float32)       # longueur relative des touches
         self.pen = np.zeros((H, W), np.float32)       # plume : couverture 0..1
         self.hi = np.zeros((H, W), np.float32)        # rehauts : 0..1
+        self.mat = np.zeros((H, W), np.uint8)         # matière (MATERIALS)
 
     def put(self, m, c, flow=None, fw=0.85, ln=None):
         """Peint la couleur ou la carte c à travers le masque m (0..1), par-dessus."""
@@ -52,6 +77,8 @@ class Scene:
         self.pen *= (1 - mm[..., 0])
         self.hi *= (1 - mm[..., 0])
         sel = m > 0.5
+        if current_material():
+            self.mat[sel] = current_material()
         if flow is not None:
             self.flow[sel] = np.broadcast_to(np.asarray(flow, np.float32), (H, W))[sel]
             self.fw[sel] = np.broadcast_to(np.asarray(fw, np.float32), (H, W))[sel]

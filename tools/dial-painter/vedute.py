@@ -8,7 +8,7 @@ import math
 import numpy as np
 from scipy import ndimage as ndi
 from wm_paint import W, H, YY, XX, Layer, fbm, smooth, hexrgb
-from painter import col3
+from painter import col3, current_material
 
 HAZE = 0.9
 LDIR = np.array([-0.55, -0.62, 0.56])  # lumière : haut gauche, un peu de face
@@ -111,6 +111,7 @@ class Group:
         self.ln = np.ones((H, W), np.float32)
         self.pen = np.zeros((H, W), np.float32)
         self.hi = np.zeros((H, W), np.float32)
+        self.mat = np.zeros((H, W), np.uint8)
 
     def put(self, m, v, flow=None, fw=0.85, ln=None):
         m = np.clip(m, 0, 1)
@@ -122,6 +123,8 @@ class Group:
         self.P = self.P * (1 - m[..., None]) + c * m[..., None]
         self.A = self.A * (1 - m) + m
         sel = m > 0.5
+        if current_material():
+            self.mat[sel] = current_material()
         if flow is not None:
             self.flow[sel] = np.broadcast_to(np.asarray(flow, np.float32), (H, W))[sel]
             self.fw[sel] = np.broadcast_to(np.asarray(fw, np.float32), (H, W))[sel]
@@ -144,6 +147,8 @@ class Group:
         a = self.A
         sc.put(a, self.color())
         sel = a > 0.5
+        if hasattr(sc, 'mat'):
+            sc.mat[sel & (self.mat > 0)] = self.mat[sel & (self.mat > 0)]
         sc.flow[sel] = self.flow[sel]
         sc.fw[sel] = self.fw[sel]
         sc.lenm[sel] = self.ln[sel]
