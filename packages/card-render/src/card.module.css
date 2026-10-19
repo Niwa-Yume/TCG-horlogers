@@ -1,0 +1,45 @@
+.min {
+  transform-box: view-box;
+  transform-origin: 126px 176px;
+  animation: tick 3600s linear infinite;
+}
+@keyframes tick {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .min {
+    animation: none;
+  }
+}
+
+.loupe {
+  position: relative;
+  touch-action: none;
+  cursor: crosshair;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.loupe:focus-visible {
+  outline: 2px solid var(--steel-blue, #213a9c);
+  outline-offset: 4px;
+}
+.lens {
+  position: absolute;
+  width: 124px;
+  height: 124px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 5px solid #121114;
+  box-shadow: 0 16px 30px -12px rgba(18, 17, 20, 0.6);
+  background: #f2ecdf;
+  pointer-events: none;
+}
+.lensInner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: top left;
+}

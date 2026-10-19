@@ -1,0 +1,25 @@
+{
+  "name": "@wm/card-render",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "@wm/shared": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "^19",
+    "react-i18next": "^15"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "react": "^19.2.0",
+    "react-i18next": "^15.7.4",
+    "i18next": "^25.10.10",
+    "vite": "^7.1.0"
+  }
+}
