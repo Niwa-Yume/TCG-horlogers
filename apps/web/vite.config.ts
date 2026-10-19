@@ -7,7 +7,7 @@ export default defineConfig({
   envDir: '../..',
   server: {
     proxy: {
-      '/api': 'http://localhost:3000',
+      '/api': { target: 'http://localhost:3000', ws: true }, // ws : Socket.IO du duel
       // pages de partage (balises Open Graph) servies par l'API, comme derrière Caddy
       '/partage': { target: 'http://localhost:3000', rewrite: (p) => `/api${p}` },
     },

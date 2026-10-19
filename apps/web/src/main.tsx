@@ -1,4 +1,4 @@
-import { StrictMode } from 'react';
+import { lazy, StrictMode, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createBrowserRouter, RouterProvider } from 'react-router';
@@ -14,6 +14,13 @@ import { Home } from './pages/Home';
 import { Wind } from './pages/Wind';
 import { Album } from './pages/Album';
 import { initAnalytics } from './track';
+import { Balance } from '@wm/ui';
+
+import Tutorial from './pages/duel/Tutorial';
+
+// le duel en direct (Socket.IO) ne pèse que sur sa page ; le tutoriel, léger, part avec le reste
+const DuelPage = lazy(() => import('./pages/duel/DuelPage'));
+const later = (el: React.ReactNode) => <Suspense fallback={<Balance />}>{el}</Suspense>;
 
 sound.init('/sounds/');
 initAnalytics();
@@ -28,6 +35,8 @@ const router = createBrowserRouter([
       { path: '/catalogue', element: <Catalogue /> },
       { path: '/remonter', element: <Wind /> },
       { path: '/collection', element: <Album /> },
+      { path: '/duel', element: later(<DuelPage />) },
+      { path: '/duel/tutoriel', element: <Tutorial /> },
       { path: '/carte/:slug', element: <CardPage /> },
       { path: '/systeme', element: <System /> },
       { path: '/admin', element: <Admin /> },
