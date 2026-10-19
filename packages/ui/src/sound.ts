@@ -81,8 +81,9 @@ export const sound = {
     for (const ev of ['pointerdown', 'keydown'] as const)
       addEventListener(ev, unlock, { once: true, capture: true, passive: true });
   },
-  play(name: SoundName) {
-    set({ caption: { name, at: Date.now() } });
+  /** `caption: false` quand l'écran montre déjà l'information (le tic-tac du minuteur). */
+  play(name: SoundName, { caption = true } = {}) {
+    if (caption) set({ caption: { name, at: Date.now() } });
     if (state.muted) return;
     unlock();
     void buffer(name).then((b) => {
