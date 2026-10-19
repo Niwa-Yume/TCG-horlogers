@@ -227,8 +227,15 @@ reste à mesurer sur un téléphone moyen.
   rendue à l'enchérisseur battu ; on ne surenchérit pas sur soi-même. À l'échéance, le vendeur touche le prix moins
   **5 % de taxe brûlée** (arrondie au Rubis supérieur, inscrite au registre en `TAX`, créditée à personne) et la
   carte change de main. Sans mise, la carte revient au vendeur ; on peut retirer une vente tant qu'il n'y a pas de mise.
-- **Règlement** : un ménage toutes les 30 s dans le processus API, et à chaque lecture du marché (idempotent, sous
-  verrou de ligne). Pas de tâche cron externe.
+- **Règlement** : chaque processus API fait le ménage toutes les 30 s, et à chaque lecture du marché. Le règlement est
+  idempotent (verrou de ligne sur l'enchère, puis vérification du statut) : avec plusieurs processus, une vente n'est
+  réglée qu'une fois (testé avec deux clients en parallèle). Pas de tâche cron externe.
+- **Prolongation** : une mise dans les 5 dernières minutes repousse la fin à 5 minutes après la mise, pour que
+  l'enchérisseur battu puisse répondre.
+- **Notifications** : surenchéri, adjugé, vendu (net après taxe), sans preneur, échange reçu, accepté, refusé, retiré,
+  expiré. Écrites dans la transaction de l'événement (`Notification`), elles s'affichent sur une cloche avec compteur,
+  relue toutes les 30 s quand l'onglet est visible, et sur `/notifications`, qui les marque comme lues. Pas de push
+  navigateur ni de courriel pour l'instant.
 - **Échanges à double confirmation** : l'auteur confirme en proposant (1 à 5 cartes de chaque côté), ses cartes sont
   verrouillées ; le destinataire confirme en acceptant, ses cartes sont vérifiées et tout s'échange dans la même
   transaction. Les cartes du destinataire ne sont pas verrouillées à la proposition (sinon n'importe qui pourrait
@@ -240,8 +247,10 @@ reste à mesurer sur un téléphone moyen.
   vérifie que deux mises simultanées au même prix ne passent pas toutes les deux.
 - **Délai avant de vendre** : un invité ne vend, n'enchérit ni n'échange ; un compte peut vendre et échanger
   72 h après sa connexion (`signedUpAt`, réglable par `SELL_DELAY_HOURS` ; 0 en local).
-- **Limite d'actions** : 30 écritures par minute et par session, 120 par adresse IP (`429`), en mémoire du processus.
-  Les lectures et l'admin ne sont pas limitées.
+- **Limite d'actions** : 30 écritures par minute et par session, 120 par adresse IP (`429`). Les compteurs vivent
+  dans Postgres (`ActionCount`, une ligne par clé et par minute, incrémentée et lue en une requête), donc partagés par
+  tous les processus API ; la session y figure sous forme d'empreinte, jamais en clair. Fenêtre fixe d'une minute
+  (une rafale à cheval sur deux minutes peut aller jusqu'au double). Les lectures et l'admin ne sont pas limitées.
 - **Connexion de développement** : `/api/auth/dev?name=…` crée un compte sans OAuth pour tester le marché à plusieurs.
   Active seulement avec `DEV_LOGIN=1` **et** une `PUBLIC_URL` en `http://` ; `docker-compose.yml` ne la transmet pas.
 - **Navigation** : la barre mobile suit la maquette de l'album (Remonter, Album, Duel, Enchères) ; le catalogue est
