@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Link, useParams } from 'react-router';
+import { Link, useParams, useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Card, Loupe } from '@wm/card-render';
 import { BOOSTER_ODDS } from '@wm/shared';
 import { Balance, Button, StateBox } from '@wm/ui';
-import { api, HttpError, langOf } from '../api';
+import { api, HttpError, langOf, shareLink } from '../api';
 import s from './card.module.css';
 
 export function CardPage() {
   const { slug = '' } = useParams();
+  const learn = useSearchParams()[0].get('apprendre') === '1';
   const { t, i18n } = useTranslation();
   const lang = langOf(i18n.language);
   const q = useQuery({ queryKey: ['card', lang, slug], queryFn: () => api.card(lang, slug) });
@@ -28,7 +29,7 @@ export function CardPage() {
     return (
       <div className={`wm-wrap ${s.page}`}>
         {q.error instanceof HttpError && q.error.status === 404 ? (
-          <StateBox title={t('card.notFoundTitle')} action={<Link to="/">{t('card.back')}</Link>}>
+          <StateBox title={t('card.notFoundTitle')} action={<Link to="/catalogue">{t('card.back')}</Link>}>
             {t('card.notFoundText')}
           </StateBox>
         ) : (
@@ -43,22 +44,14 @@ export function CardPage() {
   const c = q.data;
   const rarity = t(`card:rarity.${c.rarity}`);
   const share = async () => {
-    const url = location.href;
-    try {
-      if (navigator.share) await navigator.share({ title: c.name, url });
-      else {
-        await navigator.clipboard.writeText(url);
-        setNote(t('card.copied'));
-      }
-    } catch {
-      /* partage annulé */
-    }
+    if (await shareLink(c.name, `${location.origin}/partage/c/${c.slug}?lang=${lang}`))
+      setNote(t('card.copied'));
   };
 
   return (
     <div className={`wm-wrap ${s.page}`}>
       <div className={s.bar}>
-        <Link to="/" aria-label={t('card.back')} className={s.backLink}>
+        <Link to="/catalogue" aria-label={t('card.back')} className={s.backLink}>
           <svg
             width="22"
             height="22"
@@ -80,7 +73,9 @@ export function CardPage() {
 
       <div className={s.layout}>
         <div className={s.stage}>
-          <p className={`wm-muted ${s.hint}`}>{t('card.hint')}</p>
+          <p className={`${learn && !found ? s.learn : 'wm-muted'} ${s.hint}`}>
+            {learn && !found ? t('learn') : t('card.hint')}
+          </p>
           {back ? (
             <Card card={c} face="back" width={width} eager />
           ) : (

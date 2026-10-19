@@ -84,3 +84,8 @@
   align-items: center;
   gap: var(--s3);
 }
+.learn {
+  border: 2px solid var(--steel-blue);
+  padding: 10px 12px;
+  color: var(--ink);
+}
