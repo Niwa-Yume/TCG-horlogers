@@ -89,10 +89,15 @@ model User {
   tutorialDone  Boolean        @default(false)
   boostersOpened Int           @default(0) // le premier booster garantit une Grisaille au moins
   lastDaily     DateTime? // dernière récompense quotidienne
+  signedUpAt    DateTime? // connexion Google/Discord : point de départ du délai avant de pouvoir vendre
   createdAt     DateTime       @default(now())
   cards         CardInstance[]
   decks         Deck[]
   ledger        LedgerEntry[]
+  sales         Auction[]      @relation("seller")
+  bids          Bid[]
+  tradesOut     Trade[]        @relation("tradeFrom")
+  tradesIn      Trade[]        @relation("tradeTo")
 
   @@unique([provider, providerId])
 }
@@ -102,10 +107,78 @@ model CardInstance {
   cardId     String
   ownerId    String
   acquiredAt DateTime @default(now())
+  /// verrou pendant une vente ou un échange : « auction:<id> » ou « trade:<id> » ; null = libre
+  lock       String?
   card       Card     @relation(fields: [cardId], references: [id])
   owner      User     @relation(fields: [ownerId], references: [id])
+  auctions   Auction[]
 
   @@index([ownerId, cardId])
+}
+
+enum AuctionStatus {
+  OPEN
+  SOLD
+  EXPIRED
+  CANCELLED
+}
+
+model Auction {
+  id         String        @id @default(cuid())
+  instanceId String
+  sellerId   String
+  startPrice Int
+  /// meilleure mise en cours ; les Rubis du meilleur enchérisseur sont mis sous séquestre
+  bestBid    Int?
+  bestBidder String?
+  endsAt     DateTime
+  status     AuctionStatus @default(OPEN)
+  createdAt  DateTime      @default(now())
+  settledAt  DateTime?
+  instance   CardInstance  @relation(fields: [instanceId], references: [id])
+  seller     User          @relation("seller", fields: [sellerId], references: [id])
+  bids       Bid[]
+
+  @@index([status, endsAt])
+}
+
+model Bid {
+  id        String   @id @default(cuid())
+  auctionId String
+  bidderId  String
+  amount    Int
+  createdAt DateTime @default(now())
+  auction   Auction  @relation(fields: [auctionId], references: [id])
+  bidder    User     @relation(fields: [bidderId], references: [id])
+
+  @@index([auctionId])
+}
+
+enum TradeStatus {
+  PENDING
+  DONE
+  DECLINED
+  CANCELLED
+  EXPIRED
+}
+
+/// Échange à double confirmation : l'auteur confirme en proposant (ses cartes sont verrouillées),
+/// le destinataire en acceptant (ses cartes sont vérifiées, puis tout s'échange dans la même transaction).
+model Trade {
+  id        String      @id @default(cuid())
+  fromId    String
+  toId      String
+  offerIds  String[] // exemplaires donnés par l'auteur
+  askIds    String[] // exemplaires demandés au destinataire
+  status    TradeStatus @default(PENDING)
+  createdAt DateTime    @default(now())
+  expiresAt DateTime
+  closedAt  DateTime?
+  from      User        @relation("tradeFrom", fields: [fromId], references: [id])
+  to        User        @relation("tradeTo", fields: [toId], references: [id])
+
+  @@index([toId, status])
+  @@index([fromId, status])
 }
 
 model LedgerEntry {
