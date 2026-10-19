@@ -11,14 +11,21 @@
     "seed": "tsx --env-file-if-exists=../../.env src/seed.ts",
     "prisma": "sh -c 'set -a; [ -f ../../.env ] && . ../../.env; set +a; exec prisma \"$@\"' --",
     "test": "vitest run",
-    "typecheck": "tsc -p ."
+    "typecheck": "tsc -p .",
+    "test:db": "sh -c 'set -a; . ../../.env; set +a; vitest run'"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.6",
     "@nestjs/core": "^11.1.6",
     "@nestjs/platform-express": "^11.1.6",
     "@prisma/client": "6.19.3",
+    "@resvg/resvg-js": "2.6.2",
+    "@wm/card-render": "workspace:*",
     "@wm/shared": "workspace:*",
+    "jose": "6.2.12",
+    "passport": "0.7.0",
+    "passport-discord": "0.1.4",
+    "passport-google-oauth20": "2.0.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "tsx": "^4.20.6"
@@ -26,6 +33,9 @@
   "devDependencies": {
     "@types/express": "^5.0.3",
     "@types/node": "^22.18.0",
+    "@types/passport": "1.0.17",
+    "@types/passport-google-oauth20": "2.0.17",
+    "@types/passport-oauth2": "1.8.0",
     "prisma": "6.19.3"
   }
 }
