@@ -90,11 +90,12 @@ export function StepTimer({
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [to]);
-  const mm = String(Math.floor(sec / 60)).padStart(2, '0');
-  const ss = String(sec % 60).padStart(2, '0');
+  const two = (n: number) => String(n).padStart(2, '0');
+  const hh = Math.floor(sec / 3600);
+  const text = `${hh ? `${two(hh)}:` : ''}${two(Math.floor(sec / 60) % 60)}:${two(sec % 60)}`;
   return (
     <span role="timer" aria-live="off" className={`wm-mono ${className}`}>
-      {mm}:{ss}
+      {text}
     </span>
   );
 }
