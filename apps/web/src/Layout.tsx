@@ -21,6 +21,7 @@ export function Layout() {
             <NavLink to="/collection">({t('nav2.collection')})</NavLink>
             <NavLink to="/catalogue">({t('nav.catalogue')})</NavLink>
             <NavLink to="/duel">({t('nav2.duel')})</NavLink>
+            <NavLink to="/encheres">({t('nav2.market')})</NavLink>
             <Link to="/#comment">({t('nav2.how')})</Link>
           </nav>
           <div className={s.tools}>
@@ -100,20 +101,6 @@ export function Layout() {
           </svg>
           <span>{t('nav2.album')}</span>
         </NavLink>
-        <NavLink to="/catalogue">
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            aria-hidden="true"
-          >
-            <path d="M4 5h16M4 12h16M4 19h16" />
-          </svg>
-          <span>{t('nav.catalogue')}</span>
-        </NavLink>
         <NavLink to="/duel">
           <svg
             width="22"
@@ -128,6 +115,21 @@ export function Layout() {
             <rect x="13" y="5" width="8" height="12" transform="rotate(8 17 11)" />
           </svg>
           <span>{t('nav2.duel')}</span>
+        </NavLink>
+        <NavLink to="/encheres">
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            aria-hidden="true"
+          >
+            <path d="M5 19h10M14 4l6 6M11 7l6 6M12.5 5.5l-6 6 3 3 6-6" />
+          </svg>
+          <span>{t('nav2.market')}</span>
         </NavLink>
       </nav>
       <SoundCaption />

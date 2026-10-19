@@ -1,5 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
-import type { CardDetail, CardList, CollectionView, Lang, MeView, PullView } from '@wm/shared';
+import type {
+  AuctionView,
+  CardDetail,
+  CardList,
+  CardView,
+  CollectionView,
+  Lang,
+  MeView,
+  PullView,
+  TradeView,
+} from '@wm/shared';
 
 export class HttpError extends Error {
   constructor(
@@ -33,7 +43,25 @@ export const api = {
   recycle: () => request<{ gained: number; recycled: number; me: MeView }>('/collection/recycle', post({})),
   daily: () => request<{ gained: number; me: MeView }>('/daily', { method: 'POST' }),
   logout: () => request('/auth/logout', { method: 'POST' }),
+  auctions: (lang: Lang, view: string, rarity?: string) =>
+    request<AuctionView[]>(`/market/auctions?view=${view}&lang=${lang}${rarity ? `&rarity=${rarity}` : ''}`),
+  sell: (instanceId: string, startPrice: number) =>
+    request('/market/auctions', post({ instanceId, startPrice })),
+  bid: (id: string, amount: number) => request(`/market/auctions/${id}/bid`, post({ amount })),
+  cancelAuction: (id: string) => request(`/market/auctions/${id}/cancel`, post({})),
+  myFreeCards: (lang: Lang) => request<FreeCard[]>(`/market/mine?lang=${lang}`),
+  players: (q: string) =>
+    request<{ id: string; name: string; rating: number }[]>(`/market/players?q=${encodeURIComponent(q)}`),
+  playerCards: (id: string, lang: Lang) =>
+    request<{ name: string; cards: FreeCard[] }>(`/market/players/${id}/cards?lang=${lang}`),
+  trades: (lang: Lang) => request<TradeView[]>(`/market/trades?lang=${lang}`),
+  propose: (toId: string, offerIds: string[], askIds: string[]) =>
+    request('/market/trades', post({ toId, offerIds, askIds })),
+  decide: (id: string, action: 'accept' | 'decline' | 'cancel') =>
+    request(`/market/trades/${id}/${action}`, post({})),
 };
+
+export type FreeCard = CardView & { instanceId: string };
 
 const post = (body: unknown): RequestInit => ({
   method: 'POST',
@@ -66,3 +94,5 @@ export function admin<T>(token: string, path: string, method = 'GET', body?: unk
 }
 
 export const langOf = (l: string): Lang => (l.startsWith('en') ? 'en' : 'fr');
+
+export const providerName = (p: string) => ({ google: 'Google', discord: 'Discord' })[p] ?? p;

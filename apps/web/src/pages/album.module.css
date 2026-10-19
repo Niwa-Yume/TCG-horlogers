@@ -134,3 +134,13 @@
   font-size: 40px;
   line-height: 1;
 }
+.headLinks {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.headLinks a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}

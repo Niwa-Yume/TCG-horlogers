@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { BoosterBack, Card } from '@wm/card-render';
 import { BOOSTER_ODDS, RECYCLE_RUBIS, type PulledCard } from '@wm/shared';
 import { Balance, Button, buttonClass, sound, StateBox, StepTimer } from '@wm/ui';
-import { api, HttpError, langOf, shareLink, useMe } from '../api';
+import { providerName, api, HttpError, langOf, shareLink, useMe } from '../api';
 import { CrownSvg } from '../Crown';
 import { once, secondsSinceFirstVisit, track } from '../track';
 import s from './wind.module.css';
@@ -402,7 +402,7 @@ function Done({
               <div className={s.pair}>
                 {providers.map((p) => (
                   <a key={p} href={`/api/auth/${p}`} className={buttonClass('secondary')}>
-                    {t('album.with', { p: p === 'google' ? 'Google' : 'Discord' })}
+                    {t('album.with', { p: providerName(p) })}
                   </a>
                 ))}
               </div>

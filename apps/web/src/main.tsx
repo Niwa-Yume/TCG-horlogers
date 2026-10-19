@@ -13,6 +13,7 @@ import { System } from './pages/System';
 import { Home } from './pages/Home';
 import { Wind } from './pages/Wind';
 import { Album } from './pages/Album';
+import { Market } from './pages/Market';
 import { initAnalytics } from './track';
 import { Balance } from '@wm/ui';
 
@@ -35,6 +36,7 @@ const router = createBrowserRouter([
       { path: '/catalogue', element: <Catalogue /> },
       { path: '/remonter', element: <Wind /> },
       { path: '/collection', element: <Album /> },
+      { path: '/encheres', element: <Market /> },
       { path: '/duel', element: later(<DuelPage />) },
       { path: '/duel/tutoriel', element: <Tutorial /> },
       { path: '/carte/:slug', element: <CardPage /> },

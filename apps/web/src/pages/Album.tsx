@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { FluidCard } from '@wm/card-render';
 import { centuryOf, DAILY_RUBIS, RECYCLE_RUBIS, type CardType, type CollectionView } from '@wm/shared';
 import { Balance, Button, buttonClass, Chip, SectionLabel, StateBox } from '@wm/ui';
-import { api, langOf, useMe } from '../api';
+import { providerName, api, langOf, useMe } from '../api';
 import { once, track } from '../track';
 import s from './album.module.css';
 
@@ -94,9 +94,10 @@ export function Album() {
 
   const m = me.data;
   const c = col.data;
-  const dupes = c.owned.filter((o) => o.count > 1);
-  const dupeCount = dupes.reduce((a, o) => a + o.count - 1, 0);
-  const dupeGain = dupes.reduce((a, o) => a + (o.count - 1) * RECYCLE_RUBIS[o.card.rarity], 0);
+  // recyclables : les doublons libres (une carte en vente ou en échange reste bloquée)
+  const extra = (o: (typeof c.owned)[number]) => Math.max(0, o.count - o.locked - 1);
+  const dupeCount = c.owned.reduce((a, o) => a + extra(o), 0);
+  const dupeGain = c.owned.reduce((a, o) => a + extra(o) * RECYCLE_RUBIS[o.card.rarity], 0);
   const visible = c.owned.filter((o) => !type || o.card.type === type);
 
   const sections = era
@@ -127,11 +128,16 @@ export function Album() {
         <SectionLabel count={c.owned.length} total={c.catalogue}>
           {t('album.label')}
         </SectionLabel>
-        {m?.exists && (
-          <span className={`wm-mono ${s.rubis}`}>
-            {t('album.rubis', { n: m.rubis.toLocaleString(lang) })}
-          </span>
-        )}
+        <span className={s.headLinks}>
+          <Link to="/catalogue" className="wm-mono">
+            {t('nav.catalogue')} →
+          </Link>
+          {m?.exists && (
+            <span className={`wm-mono ${s.rubis}`}>
+              {t('album.rubis', { n: m.rubis.toLocaleString(lang) })}
+            </span>
+          )}
+        </span>
       </div>
       <h1 className={`wm-display ${s.title}`}>{t('album.title')}</h1>
 
@@ -154,7 +160,7 @@ export function Album() {
                 <span className="wm-muted">{t('album.guest')}</span>
                 {m.providers.map((p) => (
                   <a key={p} href={`/api/auth/${p}`} className={buttonClass('secondary')}>
-                    {t('album.with', { p: p === 'google' ? 'Google' : 'Discord' })}
+                    {t('album.with', { p: providerName(p) })}
                   </a>
                 ))}
               </>
