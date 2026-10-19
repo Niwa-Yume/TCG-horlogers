@@ -104,3 +104,56 @@
 .main {
   min-height: 100svh;
 }
+.cta {
+  display: none;
+}
+.game {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: var(--rule);
+  background: var(--paper);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.game > a,
+.game > span {
+  min-height: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  text-decoration: none;
+  font-size: 10.5px;
+  text-align: center;
+}
+.game > a[aria-current='page'] {
+  background: var(--ink);
+  color: var(--paper);
+}
+.disabled {
+  color: var(--ink-muted);
+}
+@media (max-width: 899px) {
+  :global(:root) {
+    --bottom-bar: 64px; /* le sous-titre sonore passe au-dessus de la barre de jeu */
+  }
+  .nav {
+    display: none;
+  }
+  .footer {
+    padding-bottom: 64px;
+  }
+}
+@media (min-width: 900px) {
+  .game {
+    display: none;
+  }
+  .cta {
+    display: inline-flex;
+  }
+}

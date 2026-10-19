@@ -1,9 +1,11 @@
-import type { CardDetail, CardList, Lang } from '@wm/shared';
+import { useQuery } from '@tanstack/react-query';
+import type { CardDetail, CardList, CollectionView, Lang, MeView, PullView } from '@wm/shared';
 
 export class HttpError extends Error {
   constructor(
     public status: number,
     message: string,
+    public body: Record<string, unknown> | null = null,
   ) {
     super(message);
   }
@@ -13,7 +15,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`/api${path}`, init);
   if (!res.ok) {
     const body = (await res.json().catch(() => null)) as { message?: string } | null;
-    throw new HttpError(res.status, body?.message ?? res.statusText);
+    throw new HttpError(res.status, body?.message ?? res.statusText, body);
   }
   return res.json() as Promise<T>;
 }
@@ -25,7 +27,35 @@ export const api = {
     return request<CardList>(`/cards?${q}`);
   },
   card: (lang: Lang, slug: string) => request<CardDetail>(`/cards/${encodeURIComponent(slug)}?lang=${lang}`),
+  me: () => request<MeView>('/me'),
+  open: (lang: Lang) => request<PullView>(`/boosters/open?lang=${lang}`, { method: 'POST' }),
+  collection: (lang: Lang) => request<CollectionView>(`/collection?lang=${lang}`),
+  recycle: () => request<{ gained: number; recycled: number; me: MeView }>('/collection/recycle', post({})),
+  daily: () => request<{ gained: number; me: MeView }>('/daily', { method: 'POST' }),
+  logout: () => request('/auth/logout', { method: 'POST' }),
 };
+
+const post = (body: unknown): RequestInit => ({
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(body),
+});
+
+export const useMe = () => useQuery({ queryKey: ['me'], queryFn: api.me });
+
+/** Partage natif (mobile), sinon copie du lien. Rend true si le lien a été copié. */
+export async function shareLink(title: string, url: string): Promise<boolean> {
+  try {
+    if (navigator.share) {
+      await navigator.share({ title, url });
+      return false;
+    }
+    await navigator.clipboard.writeText(url);
+    return true;
+  } catch {
+    return false; // partage annulé
+  }
+}
 
 export function admin<T>(token: string, path: string, method = 'GET', body?: unknown) {
   return request<T>(`/admin${path}`, {
