@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>WristMasters TCG — Accueil</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders:wght@800;900&amp;family=Instrument+Serif:ital@0;1&amp;family=Instrument+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap">
+<style>
+body{margin:0;background:#F2ECDF}
+a{color:#121114}a:hover{color:#213A9C}
+a:focus-visible,button:focus-visible{outline:2px solid #213A9C;outline-offset:3px}
+.wm-track{display:flex;width:max-content;animation:wm-marquee 38s linear infinite}
+@keyframes wm-marquee{to{transform:translateX(-50%)}}
+.wm-dial{transform-box:view-box;transform-origin:70px 70px}
+@media (prefers-reduced-motion: reduce){.wm-track{animation:none}}
+</style>
+</helmet>
+<div style="background: #F2ECDF; color: #121114; font-family: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif; font-size: 16px; line-height: 1.5; overflow: hidden">
+
+<header style="border-bottom: 1px solid #121114">
+<div style="max-width: 1360px; margin: 0 auto; padding: 14px 40px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 32px">
+<a href="Main.dc.html" style="display: flex; align-items: baseline; gap: 8px; text-decoration: none; color: #121114">
+<span style="font-family: 'Big Shoulders', 'Arial Narrow', sans-serif; font-weight: 900; font-size: 30px; line-height: 1; letter-spacing: 0.01em">WRISTMASTERS</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.2em">TCG</span>
+</a>
+<nav aria-label="Navigation principale" style="display: flex; flex-wrap: wrap; gap: 6px 28px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; letter-spacing: 0.04em">
+<a href="Album.dc.html" style="text-decoration: none; padding: 10px 0">(Collection)</a>
+<a href="Duel.dc.html" style="text-decoration: none; padding: 10px 0">(Duel)</a>
+<a href="#encheres" style="text-decoration: none; padding: 10px 0">(Enchères)</a>
+<a href="#comment" style="text-decoration: none; padding: 10px 0">(Comment ça marche)</a>
+</nav>
+<a href="Remontage.dc.html" style="display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 20px; background: #213A9C; color: #F2ECDF; text-decoration: none; font-weight: 600; font-size: 15px">Remonter ma première montre <span aria-hidden="true">→</span></a>
+</div>
+</header>
+
+<div aria-hidden="true" style="border-bottom: 1px solid #121114; overflow: hidden; padding: 18px 0 10px">
+<div class="wm-track" style="font-family: 'Big Shoulders', 'Arial Narrow', sans-serif; font-weight: 900; font-size: clamp(84px, 13.5vw, 214px); line-height: 0.84; letter-spacing: -0.005em; white-space: nowrap">
+<span style="padding-right: 0.3em">REMONTE TA PREMIÈRE MONTRE —</span>
+<span style="padding-right: 0.3em">REMONTE TA PREMIÈRE MONTRE —</span>
+<span style="padding-right: 0.3em">REMONTE TA PREMIÈRE MONTRE —</span>
+<span style="padding-right: 0.3em">REMONTE TA PREMIÈRE MONTRE —</span>
+</div>
+</div>
+
+<section aria-labelledby="hero-title" style="max-width: 1360px; margin: 0 auto; padding: 56px 40px 64px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(460px, 100%), 1fr)); gap: 48px; align-items: center">
+<div style="display: flex; flex-direction: column; gap: 28px; min-width: 0">
+<p style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; letter-spacing: 0.06em">(Le jeu de cartes de l'horlogerie)</p>
+<h1 id="hero-title" style="margin: 0; font-family: 'Instrument Serif', 'Times New Roman', serif; font-weight: 400; font-size: clamp(40px, 4.6vw, 66px); line-height: 1.02; letter-spacing: -0.01em; text-wrap: balance">Breguet, Harrison, le tourbillon, la crise du quartz. Collectionne l'histoire de l'horlogerie, carte par carte.</h1>
+<p style="margin: 0; max-width: 54ch; font-size: 18px; color: #4E4943">Cinq cents cartes tirées de Wikipédia et retravaillées à la main. Un booster gratuit toutes les dix minutes, qu'on ouvre en remontant une couronne. Des duels en direct qui tiennent dans une pause café.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<a href="Remontage.dc.html" style="display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 26px; background: #213A9C; color: #F2ECDF; text-decoration: none; font-weight: 600; font-size: 17px">Remonter ma première montre <span aria-hidden="true">→</span></a>
+<a href="#comment" style="display: inline-flex; align-items: center; min-height: 52px; padding: 0 22px; border: 1px solid #121114; text-decoration: none; font-weight: 500; font-size: 17px">Comment ça marche</a>
+</div>
+<p style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.04em; color: #4E4943">Gratuit. Sans compte pour ouvrir ton premier booster. FR / EN.</p>
+</div>
+
+<div style="position: relative; height: 540px; min-width: 0">
+<div style="position: absolute; left: 50%; top: 40px; transform: translateX(-95%) rotate(-11deg); transform-origin: bottom center">
+<dc-import name="Card" card="spiral" hint-size="252px,352px"></dc-import>
+</div>
+<div style="position: absolute; left: 50%; top: 20px; transform: translateX(-28%) rotate(7deg); transform-origin: bottom center">
+<dc-import name="Card" card="quantieme" hint-size="252px,352px"></dc-import>
+</div>
+<div style="position: absolute; left: 50%; top: 72px; transform: translateX(-62%) rotate(-1.5deg); box-shadow: 0 30px 50px -24px rgba(18,17,20,.55)">
+<dc-import name="Card" card="tourbillon" hint-size="252px,352px"></dc-import>
+</div>
+<a href="Remontage.dc.html" aria-label="Remonter ta première montre" style="position: absolute; right: 4%; bottom: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; text-decoration: none">
+<svg width="140" height="140" viewBox="0 0 140 140" aria-hidden="true">
+<g class="wm-dial">
+<circle cx="70" cy="70" r="64" fill="#121114"></circle>
+<path d="{{crownTeeth}}" fill="#121114" stroke="#F2ECDF" stroke-width="1"></path>
+<circle cx="70" cy="70" r="50" fill="#121114" stroke="#F2ECDF" stroke-width="1"></circle>
+<circle cx="70" cy="70" r="40" fill="none" stroke="#F2ECDF" stroke-width="0.6"></circle>
+<text x="70" y="78" text-anchor="middle" font-family="Big Shoulders, Arial Narrow, sans-serif" font-weight="900" font-size="24" fill="#F2ECDF">WM</text>
+</g>
+</svg>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.06em">(Fais-la tourner. 12 crans.)</span>
+</a>
+</div>
+</section>
+
+<section aria-labelledby="drop-title" style="border-top: 1px solid #121114; border-bottom: 1px solid #121114">
+<div style="max-width: 1360px; margin: 0 auto; padding: 28px 40px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 48px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h2 id="drop-title" style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 500; font-size: 13px; letter-spacing: 0.06em">(Prochain booster)</h2>
+<p aria-live="off" style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 700; font-size: clamp(48px, 6vw, 80px); line-height: 1; font-variant-numeric: tabular-nums">{{countdown}}</p>
+</div>
+<p style="margin: 0; max-width: 46ch; color: #4E4943">Un booster de cinq cartes toutes les dix minutes. Ils s'empilent jusqu'à dix si tu t'absentes : personne ne perd un tirage pour cause de réunion.</p>
+<div style="display: flex; flex-direction: column; align-items: flex-start; gap: 8px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px">Stock 3 — 10</span>
+<div aria-hidden="true" style="display: flex; gap: 4px">
+<span style="width: 14px; height: 20px; background: #121114"></span><span style="width: 14px; height: 20px; background: #121114"></span><span style="width: 14px; height: 20px; background: #121114"></span>
+<span style="width: 14px; height: 20px; border: 1px solid #121114; box-sizing: border-box"></span><span style="width: 14px; height: 20px; border: 1px solid #121114; box-sizing: border-box"></span><span style="width: 14px; height: 20px; border: 1px solid #121114; box-sizing: border-box"></span><span style="width: 14px; height: 20px; border: 1px solid #121114; box-sizing: border-box"></span><span style="width: 14px; height: 20px; border: 1px solid #121114; box-sizing: border-box"></span><span style="width: 14px; height: 20px; border: 1px solid #121114; box-sizing: border-box"></span><span style="width: 14px; height: 20px; border: 1px solid #121114; box-sizing: border-box"></span>
+</div>
+</div>
+</div>
+</section>
+
+<section id="comment" aria-labelledby="how-title" style="max-width: 1360px; margin: 0 auto; padding: 72px 40px; display: flex; flex-direction: column; gap: 40px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px 32px">
+<h2 id="how-title" style="margin: 0; font-family: 'Big Shoulders', 'Arial Narrow', sans-serif; font-weight: 900; font-size: clamp(48px, 6vw, 88px); line-height: 0.9; text-wrap: balance">UNE BOUCLE, QUATRE GESTES.</h2>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px">(Comment ça marche) 1 — 4</span>
+</div>
+<ol style="margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); border-top: 1px solid #121114">
+<sc-for list="{{steps}}" as="s" hint-placeholder-count="4">
+<li style="display: flex; flex-direction: column; gap: 12px; padding: 24px 24px 28px 0; border-bottom: 1px solid #121114">
+<span style="font-family: 'Big Shoulders', 'Arial Narrow', sans-serif; font-weight: 900; font-size: 64px; line-height: 0.9">{{s.n}}</span>
+<h3 style="margin: 0; font-family: 'Instrument Serif', 'Times New Roman', serif; font-weight: 400; font-size: 30px; line-height: 1.05">{{s.title}}</h3>
+<p style="margin: 0; color: #4E4943; max-width: 34ch">{{s.text}}</p>
+</li>
+</sc-for>
+</ol>
+</section>
+
+<section aria-labelledby="rare-title" style="background: #121114; color: #F2ECDF">
+<div style="max-width: 1360px; margin: 0 auto; padding: 72px 40px 80px; display: flex; flex-direction: column; gap: 40px">
+<div style="display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px 32px">
+<h2 id="rare-title" style="margin: 0; font-family: 'Big Shoulders', 'Arial Narrow', sans-serif; font-weight: 900; font-size: clamp(48px, 6vw, 88px); line-height: 0.9; text-wrap: balance">DU BURIN AU GRAND FEU.</h2>
+<p style="margin: 0; max-width: 44ch; color: #CFC8BB">Chaque rareté est un métier d'art horloger. Plus la carte est rare, plus la technique est exigeante. Ça se voit avant même de lire le nom.</p>
+</div>
+<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 28px 24px">
+<sc-for list="{{rarities}}" as="r" hint-placeholder-count="5">
+<figure style="margin: 0; display: flex; flex-direction: column; gap: 14px; width: 252px">
+<dc-import name="Card" card="{{r.key}}" hint-size="252px,352px"></dc-import>
+<figcaption style="display: flex; justify-content: space-between; gap: 8px; border-top: 1px solid #5C574F; padding-top: 10px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.04em">
+<span>{{r.label}}</span>
+<span style="color: #CFC8BB">{{r.rate}} des tirages</span>
+</figcaption>
+</figure>
+</sc-for>
+</div>
+</div>
+</section>
+
+<section aria-labelledby="duel-title" style="max-width: 1360px; margin: 0 auto; padding: 80px 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr)); gap: 40px; align-items: end">
+<h2 id="duel-title" style="margin: 0; font-family: 'Big Shoulders', 'Arial Narrow', sans-serif; font-weight: 900; font-size: clamp(64px, 9vw, 150px); line-height: 0.84">5 MANCHES. 3 CRANS. 1 CAFÉ.</h2>
+<div style="display: flex; flex-direction: column; gap: 20px; min-width: 0">
+<p style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; letter-spacing: 0.04em">(Duel)</p>
+<p style="margin: 0; font-size: 18px; max-width: 46ch">Un critère tiré au sort à chaque manche : précision, complication, innovation, prestige ou héritage. Vous posez une carte en même temps. Tes trois crans de réserve de marche se jouent en secret : un peu de bluff, beaucoup de calcul.</p>
+<p style="margin: 0; color: #4E4943; max-width: 46ch">Une question n'arrive qu'aux moments décisifs. Si tu connais ton Breguet, tu prends deux points d'avance.</p>
+<a href="Duel.dc.html" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 24px; border: 1px solid #121114; text-decoration: none; font-weight: 600; font-size: 17px">Voir un duel <span aria-hidden="true">→</span></a>
+</div>
+</section>
+
+<footer id="encheres" style="border-top: 1px solid #121114">
+<div style="max-width: 1360px; margin: 0 auto; padding: 40px 40px 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 32px">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 500; font-size: 13px">(Les trucs barbants)</h2>
+<a href="#" style="text-decoration: none">Mentions légales</a>
+<a href="#" style="text-decoration: none">Conditions d'utilisation</a>
+<a href="#" style="text-decoration: none">Confidentialité</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 500; font-size: 13px">(Crédits)</h2>
+<p style="margin: 0; color: #4E4943; max-width: 34ch">Textes des cartes adaptés de Wikipédia, sous licence CC BY-SA 4.0. Aucune affiliation avec les maisons citées.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 500; font-size: 13px">(Ailleurs)</h2>
+<a href="#" style="text-decoration: none">Instagram</a>
+<a href="#" style="text-decoration: none">TikTok</a>
+<a href="#" style="text-decoration: none">Discord</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 500; font-size: 13px">(Langue)</h2>
+<span>Français / <a href="#" style="text-decoration: none">English</a></span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: #4E4943">© 2026 WristMasters TCG. Remonté à la main.</span>
+</div>
+</div>
+<p aria-hidden="true" style="margin: 32px 0 0; font-family: 'Big Shoulders', 'Arial Narrow', sans-serif; font-weight: 900; font-size: 20.5vw; line-height: 0.74; text-align: center; letter-spacing: -0.01em; white-space: nowrap; height: 0.62em; overflow: hidden">WRISTMASTERS</p>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":3040}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { left: 402 };
+  }
+  componentDidMount() {
+    this.timer = setInterval(() => {
+      this.setState((s) => ({ left: s.left > 0 ? s.left - 1 : 600 }));
+    }, 1000);
+  }
+  componentWillUnmount() {
+    clearInterval(this.timer);
+  }
+  renderVals() {
+    const left = this.state.left;
+    const mm = String(Math.floor(left / 60)).padStart(2, '0');
+    const ss = String(left % 60).padStart(2, '0');
+    const r2 = (n) => Math.round(n * 100) / 100;
+    let crownTeeth = '';
+    for (let i = 0; i < 40; i++) {
+      const a0 = (i * 9 - 2.4) * Math.PI / 180, a1 = (i * 9 + 2.4) * Math.PI / 180;
+      const p = (r, a) => r2(70 + r * Math.sin(a)) + ' ' + r2(70 - r * Math.cos(a));
+      crownTeeth += 'M' + p(56, a0) + 'L' + p(69, a0) + 'L' + p(69, a1) + 'L' + p(56, a1) + 'Z';
+    }
+    return {
+      countdown: mm + ':' + ss,
+      crownTeeth,
+      steps: [
+        { n: '01', title: 'Remonter', text: 'Fais tourner la couronne. Douze crans, le ressort se libère, le booster s\'ouvre.' },
+        { n: '02', title: 'Inspecter', text: 'Promène la loupe sur une carte. Les curieux trouvent un poinçon caché, et l\'anecdote qui va avec.' },
+        { n: '03', title: 'Défier', text: 'Cinq manches, trois crans de réserve, un critère tiré au sort. Le meilleur gagne. Souvent.' },
+        { n: '04', title: 'Échanger', text: 'Recycle tes doublons en Rubis, mets tes Grand Feu aux enchères. Ou garde-les, on ne juge pas.' }
+      ],
+      rarities: [
+        { key: 'echappement', label: 'Gravure', rate: '60 %' },
+        { key: 'chronometre', label: 'Marqueterie', rate: '25 %' },
+        { key: 'spiral', label: 'Grisaille', rate: '10 %' },
+        { key: 'quantieme', label: 'Cloisonné', rate: '4 %' },
+        { key: 'tourbillon', label: 'Grand Feu', rate: '1 %' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

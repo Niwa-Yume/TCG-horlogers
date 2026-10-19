@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Remontage et révélation</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders:wght@800;900&amp;family=Instrument+Serif:ital@0;1&amp;family=Instrument+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap">
+<style>
+body{margin:0;background:#F2ECDF}
+a{color:#121114}a:hover{color:#213A9C}
+a:focus-visible,button:focus-visible{outline:2px solid #213A9C;outline-offset:3px}
+.wm-reveal{animation:wm-pop 1s cubic-bezier(.2,1.3,.35,1)}
+.wm-fade{animation:wm-fade .5s ease-out}
+@keyframes wm-pop{from{transform:scale(.88) rotate(-3deg);opacity:0}to{transform:none;opacity:1}}
+@keyframes wm-fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion: reduce){.wm-reveal,.wm-fade{animation:wm-fade .3s ease-out}}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; overflow: hidden; background: #F2ECDF; color: #121114; font-family: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif; display: flex; flex-direction: column">
+
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid #121114">
+<a href="Main.dc.html" style="display: flex; align-items: baseline; gap: 6px; text-decoration: none; min-height: 44px; align-items: center">
+<span style="font-family: 'Big Shoulders', 'Arial Narrow', sans-serif; font-weight: 900; font-size: 22px; line-height: 1">WRISTMASTERS</span>
+</a>
+<button type="button" onClick="{{toggleMute}}" aria-label="{{muteLabel}}" style="width: 44px; height: 44px; display: grid; place-items: center; background: transparent; border: 1px solid #121114; border-radius: 0; color: #121114; cursor: pointer">
+<sc-if value="{{soundOn}}" hint-placeholder-val="{{ true }}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"></path><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"></path></svg>
+</sc-if>
+<sc-if value="{{soundOff}}" hint-placeholder-val="{{ false }}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z"></path><path d="M17 9l5 6M22 9l-5 6"></path></svg>
+</sc-if>
+</button>
+</div>
+
+<sc-if value="{{isWind}}" hint-placeholder-val="{{ true }}">
+<div style="flex: 1; display: flex; flex-direction: column; padding: 22px 20px 24px; gap: 18px">
+<div style="display: flex; justify-content: space-between; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.04em">
+<span>(Booster offert)</span>
+<span>1 — 1</span>
+</div>
+<h1 style="margin: 0; font-family: 'Big Shoulders', 'Arial Narrow', sans-serif; font-weight: 900; font-size: 60px; line-height: 0.86">REMONTE TA PREMIÈRE MONTRE.</h1>
+<p style="margin: 0; color: #4E4943; font-size: 15px">Fais tourner la couronne dans le sens des aiguilles d'une montre. Douze crans et le ressort se libère.</p>
+
+<div style="flex: 1; display: grid; place-items: center">
+<button type="button" aria-label="Couronne : tourne-la pour remonter. Un appui ajoute un cran." onPointerDown="{{crownDown}}" onPointerMove="{{crownMove}}" onPointerUp="{{crownUp}}" onPointerCancel="{{crownUp}}" onClick="{{crownClick}}" style="width: 236px; height: 236px; padding: 0; border: 0; border-radius: 50%; background: transparent; cursor: grab; touch-action: none">
+<svg width="236" height="236" viewBox="0 0 140 140" aria-hidden="true" style="display: block; transform: rotate({{rot}}deg); transition: transform 90ms steps(2, end)">
+<circle cx="70" cy="70" r="64" fill="#121114"></circle>
+<path d="{{crownTeeth}}" fill="#121114" stroke="#F2ECDF" stroke-width="0.8"></path>
+<circle cx="70" cy="70" r="50" fill="#121114" stroke="#F2ECDF" stroke-width="0.8"></circle>
+<circle cx="70" cy="70" r="40" fill="none" stroke="#F2ECDF" stroke-width="0.5"></circle>
+<path d="M70 26 L73 34 L67 34 Z" fill="#F2ECDF"></path>
+<text x="70" y="78" text-anchor="middle" font-family="Big Shoulders, Arial Narrow, sans-serif" font-weight="900" font-size="22" fill="#F2ECDF">WM</text>
+</svg>
+</button>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.06em">
+<span>RÉSERVE DE MARCHE</span>
+<span style="font-variant-numeric: tabular-nums">{{notches}} — 12</span>
+</div>
+<div aria-hidden="true" style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4px">
+<sc-for list="{{gauge}}" as="g" hint-placeholder-count="12">
+<span style="height: 22px; box-sizing: border-box; border: 1px solid #121114; background: {{g.fill}}"></span>
+</sc-for>
+</div>
+<p aria-live="polite" style="margin: 0; min-height: 18px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; color: #4E4943">{{caption}}</p>
+</div>
+
+<button type="button" onPointerDown="{{holdStart}}" onPointerUp="{{holdStop}}" onPointerLeave="{{holdStop}}" onPointerCancel="{{holdStop}}" onKeyDown="{{holdKey}}" style="min-height: 52px; border: 1px solid #121114; background: transparent; color: #121114; font: inherit; font-weight: 600; font-size: 16px; cursor: pointer; touch-action: none">Maintenir pour remonter</button>
+</div>
+</sc-if>
+
+<sc-if value="{{isReveal}}" hint-placeholder-val="{{ false }}">
+<div style="flex: 1; display: flex; flex-direction: column; padding: 20px 20px 24px; gap: 16px">
+<div style="display: flex; justify-content: space-between; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.04em">
+<span>(Ton tirage)</span>
+<span style="font-variant-numeric: tabular-nums">{{pos}} — 5</span>
+</div>
+<div style="flex: 1; display: grid; place-items: center">
+<sc-if value="{{cardHidden}}" hint-placeholder-val="{{ true }}">
+<button type="button" onClick="{{flip}}" aria-label="Révéler la carte {{pos}} sur 5" style="width: 302px; height: 422px; padding: 0; border: 0; background: transparent; cursor: pointer">
+<svg width="302" height="422" viewBox="0 0 252 352" aria-hidden="true" style="display: block">
+<rect width="252" height="352" fill="#121114"></rect>
+<path d="{{backRays}}" stroke="#C9A24A" stroke-width="0.6" opacity="0.55"></path>
+<rect x="6" y="6" width="240" height="340" fill="none" stroke="#C9A24A" stroke-width="0.9"></rect>
+<rect x="10" y="10" width="232" height="332" fill="none" stroke="#C9A24A" stroke-width="0.4"></rect>
+<circle cx="126" cy="176" r="46" fill="#121114" stroke="#C9A24A" stroke-width="1"></circle>
+<circle cx="126" cy="176" r="40" fill="none" stroke="#C9A24A" stroke-width="0.5"></circle>
+<text x="126" y="187" text-anchor="middle" font-family="Big Shoulders, Arial Narrow, sans-serif" font-weight="900" font-size="30" fill="#C9A24A">WM</text>
+</svg>
+</button>
+</sc-if>
+<sc-if value="{{cardShown}}" hint-placeholder-val="{{ false }}">
+<div class="wm-reveal" style="width: 302px; height: 422px">
+<div style="transform: scale(1.1984); transform-origin: top left; width: 252px; height: 352px">
+<dc-import name="Card" card="{{current}}" hint-size="252px,352px"></dc-import>
+</div>
+</div>
+</sc-if>
+</div>
+<p aria-live="polite" style="margin: 0; min-height: 18px; text-align: center; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; color: #4E4943">{{caption}}</p>
+<sc-if value="{{cardHidden}}" hint-placeholder-val="{{ true }}">
+<button type="button" onClick="{{flip}}" style="min-height: 52px; border: 0; background: #213A9C; color: #F2ECDF; font: inherit; font-weight: 600; font-size: 16px; cursor: pointer">Révéler</button>
+</sc-if>
+<sc-if value="{{cardShown}}" hint-placeholder-val="{{ false }}">
+<button type="button" onClick="{{next}}" style="min-height: 52px; border: 1px solid #121114; background: transparent; color: #121114; font: inherit; font-weight: 600; font-size: 16px; cursor: pointer">{{nextLabel}}</button>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{isRinging}}" hint-placeholder-val="{{ false }}">
+<div class="wm-fade" style="position: absolute; inset: 0; background: #0A0A0B; color: #F2ECDF; display: flex; flex-direction: column; justify-content: center; padding: 32px; gap: 18px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.06em">(Sonnerie)</span>
+<p style="margin: 0; font-family: 'Big Shoulders', 'Arial Narrow', sans-serif; font-weight: 900; font-size: 64px; line-height: 0.86">RÉPÉTITION MINUTES.</p>
+<p aria-live="polite" style="margin: 0; font-size: 16px; color: #CFC8BB; max-width: 30ch">Trois coups graves, trois doubles, deux aigus. Il est 3 h 47, et ta carte est très rare.</p>
+</div>
+</sc-if>
+
+<sc-if value="{{isDone}}" hint-placeholder-val="{{ false }}">
+<div class="wm-fade" style="flex: 1; display: flex; flex-direction: column; padding: 20px 20px 24px; gap: 16px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.04em">(Ton premier tirage)</span>
+<h1 style="margin: 0; font-family: 'Big Shoulders', 'Arial Narrow', sans-serif; font-weight: 900; font-size: 52px; line-height: 0.86">CINQ CARTES. UNE GRAND FEU.</h1>
+<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 8px">
+<sc-for list="{{pulls}}" as="p" hint-placeholder-count="5">
+<div style="width: 106px; height: 148px; overflow: hidden">
+<div style="transform: scale(0.4206); transform-origin: top left; width: 252px; height: 352px">
+<dc-import name="Card" card="{{p}}" hint-size="252px,352px"></dc-import>
+</div>
+</div>
+</sc-for>
+</div>
+<div style="border-top: 1px solid #121114; padding-top: 14px; display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; font-size: 15px"><strong>Garde ta collection.</strong> Connecte-toi pour retrouver ces cartes partout. Sinon, elles restent sur cet appareil.</p>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<button type="button" style="min-height: 48px; border: 1px solid #121114; background: transparent; color: #121114; font: inherit; font-weight: 600; cursor: pointer">Avec Google</button>
+<button type="button" style="min-height: 48px; border: 1px solid #121114; background: transparent; color: #121114; font: inherit; font-weight: 600; cursor: pointer">Avec Discord</button>
+</div>
+<button type="button" style="min-height: 48px; border: 0; background: #213A9C; color: #F2ECDF; font: inherit; font-weight: 600; cursor: pointer">Partager mon tirage</button>
+<div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap">
+<a href="Loupe.dc.html" style="min-height: 44px; display: inline-flex; align-items: center; font-weight: 600">Inspecter le Tourbillon →</a>
+<button type="button" onClick="{{restart}}" style="min-height: 44px; border: 0; background: transparent; color: #4E4943; font: inherit; text-decoration: underline; cursor: pointer">Rejouer la démo</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { phase: 'wind', notches: 0, rot: 0, idx: 0, shown: false, muted: false, caption: 'Prêt. La couronne attend.' };
+    this.pulls = ['echappement', 'chronometre', 'spiral', 'quantieme', 'tourbillon'];
+    this.acc = 0;
+    this.dragging = false;
+    this.moved = false;
+  }
+  componentWillUnmount() {
+    clearInterval(this.holdTimer);
+    clearTimeout(this.ringTimer);
+    try { this.ctx && this.ctx.close(); } catch (e) {}
+  }
+
+  // ---------- Son : synthèse Web Audio (remplaçable par de vrais enregistrements) ----------
+  audio() {
+    if (this.state.muted) return null;
+    try {
+      if (!this.ctx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        this.ctx = new AC();
+        this.master = this.ctx.createGain();
+        this.master.gain.value = 0.7;
+        this.master.connect(this.ctx.destination);
+        const len = this.ctx.sampleRate;
+        this.noise = this.ctx.createBuffer(1, len, this.ctx.sampleRate);
+        const d = this.noise.getChannelData(0);
+        for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+      }
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      return this.ctx;
+    } catch (e) { return null; }
+  }
+  env(g, t, peak, attack, decay) {
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(peak, t + attack);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + attack + decay);
+  }
+  click(freq) {
+    const c = this.audio(); if (!c) return;
+    const t = c.currentTime;
+    const n = c.createBufferSource(); n.buffer = this.noise;
+    const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = freq; bp.Q.value = 1.6;
+    const g = c.createGain(); this.env(g, t, 0.9, 0.0008, 0.03);
+    n.connect(bp); bp.connect(g); g.connect(this.master); n.start(t, Math.random() * 0.5); n.stop(t + 0.06);
+    const o = c.createOscillator(); o.frequency.value = freq;
+    const og = c.createGain(); this.env(og, t, 0.25, 0.0008, 0.04);
+    o.connect(og); og.connect(this.master); o.start(t); o.stop(t + 0.06);
+  }
+  gong(f0, when, strength) {
+    const c = this.audio(); if (!c) return;
+    const t = c.currentTime + (when || 0);
+    [[1, 1, 1.4], [2.76, 0.55, 0.9], [5.4, 0.32, 0.55], [8.93, 0.18, 0.32]].forEach(([r, a, d]) => {
+      const o = c.createOscillator(); o.type = 'sine'; o.frequency.value = f0 * r;
+      const g = c.createGain(); this.env(g, t, 0.28 * a * (strength || 1), 0.002, d * 2.4);
+      o.connect(g); g.connect(this.master); o.start(t); o.stop(t + d * 2.6);
+    });
+  }
+  repeater() {
+    const low = 820, hi = 1180; let at = 0;
+    for (let i = 0; i < 3; i++) { this.gong(low, at); at += 0.55; }
+    at += 0.45;
+    for (let i = 0; i < 3; i++) { this.gong(hi, at, 0.9); this.gong(low, at + 0.19, 0.9); at += 0.62; }
+    at += 0.35;
+    for (let i = 0; i < 2; i++) { this.gong(hi, at); at += 0.42; }
+  }
+  spring() {
+    const c = this.audio(); if (!c) return;
+    const t = c.currentTime;
+    const o = c.createOscillator(); o.type = 'triangle';
+    o.frequency.setValueAtTime(1400, t); o.frequency.exponentialRampToValueAtTime(230, t + 0.6);
+    const g = c.createGain(); this.env(g, t, 0.35, 0.004, 0.55);
+    o.connect(g); g.connect(this.master); o.start(t); o.stop(t + 0.7);
+    const n = c.createBufferSource(); n.buffer = this.noise;
+    const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 0.8;
+    bp.frequency.setValueAtTime(4000, t); bp.frequency.exponentialRampToValueAtTime(700, t + 0.5);
+    const ng = c.createGain(); this.env(ng, t, 0.4, 0.003, 0.45);
+    n.connect(bp); bp.connect(ng); ng.connect(this.master); n.start(t); n.stop(t + 0.6);
+  }
+  swish() {
+    const c = this.audio(); if (!c) return;
+    const t = c.currentTime;
+    const n = c.createBufferSource(); n.buffer = this.noise;
+    const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 1.2;
+    bp.frequency.setValueAtTime(600, t); bp.frequency.exponentialRampToValueAtTime(3200, t + 0.3);
+    const g = c.createGain(); this.env(g, t, 0.3, 0.12, 0.2);
+    n.connect(bp); bp.connect(g); g.connect(this.master); n.start(t); n.stop(t + 0.36);
+  }
+  buzz() { try { navigator.vibrate && navigator.vibrate(10); } catch (e) {} }
+
+  // ---------- Remontage ----------
+  notch() {
+    if (this.state.phase !== 'wind' || this.state.notches >= 12) return;
+    const n = this.state.notches + 1;
+    this.click(3900 + n * 45);
+    this.buzz();
+    this.setState({ notches: n, caption: n < 12 ? 'Cliquet : cran ' + n + ' sur 12.' : 'Ressort armé.' });
+    if (n >= 12) {
+      clearInterval(this.holdTimer);
+      setTimeout(() => this.release(), 260);
+    }
+  }
+  release() {
+    this.spring();
+    this.setState({ phase: 'reveal', idx: 0, shown: false, caption: 'Ressort libéré. Le booster est ouvert.' });
+  }
+  angleOf(e, el) {
+    const r = el.getBoundingClientRect();
+    return Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2)) * 180 / Math.PI;
+  }
+
+  renderVals() {
+    const s = this.state;
+    const r2 = (n) => Math.round(n * 100) / 100;
+    let crownTeeth = '';
+    for (let i = 0; i < 40; i++) {
+      const a0 = (i * 9 - 2.4) * Math.PI / 180, a1 = (i * 9 + 2.4) * Math.PI / 180;
+      const p = (r, a) => r2(70 + r * Math.sin(a)) + ' ' + r2(70 - r * Math.cos(a));
+      crownTeeth += 'M' + p(56, a0) + 'L' + p(69, a0) + 'L' + p(69, a1) + 'L' + p(56, a1) + 'Z';
+    }
+    let backRays = '';
+    for (let a = 0; a < 360; a += 5) {
+      const rad = a * Math.PI / 180;
+      backRays += 'M' + r2(126 + 46 * Math.sin(rad)) + ' ' + r2(176 - 46 * Math.cos(rad)) + 'L' + r2(126 + 260 * Math.sin(rad)) + ' ' + r2(176 - 260 * Math.cos(rad));
+    }
+    const current = this.pulls[s.idx];
+    const last = s.idx >= this.pulls.length - 1;
+    return {
+      isWind: s.phase === 'wind',
+      isReveal: s.phase === 'reveal',
+      isRinging: s.phase === 'ringing',
+      isDone: s.phase === 'done',
+      soundOn: !s.muted,
+      soundOff: s.muted,
+      muteLabel: s.muted ? 'Activer le son' : 'Couper le son',
+      notches: s.notches,
+      rot: Math.round(s.rot),
+      caption: s.caption,
+      crownTeeth, backRays,
+      gauge: Array.from({ length: 12 }, (_, i) => ({ fill: i < s.notches ? '#121114' : 'transparent' })),
+      pos: s.idx + 1,
+      current,
+      cardHidden: s.phase === 'reveal' && !s.shown,
+      cardShown: s.phase === 'reveal' && s.shown,
+      nextLabel: last ? 'Voir mon tirage' : 'Carte suivante',
+      pulls: this.pulls,
+      toggleMute: () => this.setState({ muted: !s.muted }),
+      crownDown: (e) => {
+        this.audio();
+        this.dragging = true; this.moved = false; this.acc = 0;
+        this.last = this.angleOf(e, e.currentTarget);
+        try { e.currentTarget.setPointerCapture(e.pointerId); } catch (err) {}
+      },
+      crownMove: (e) => {
+        if (!this.dragging) return;
+        const a = this.angleOf(e, e.currentTarget);
+        let d = a - this.last; if (d > 180) d -= 360; if (d < -180) d += 360;
+        this.last = a;
+        if (Math.abs(d) > 0.5) this.moved = true;
+        if (d <= 0) { this.acc = Math.max(this.acc + d, -10); return; }
+        this.acc += d;
+        this.setState({ rot: this.state.rot + d });
+        while (this.acc >= 30) { this.acc -= 30; this.notch(); }
+      },
+      crownUp: () => { this.dragging = false; },
+      crownClick: () => {
+        if (this.moved) { this.moved = false; return; }
+        this.setState({ rot: this.state.rot + 30 });
+        this.notch();
+      },
+      holdStart: () => {
+        this.audio();
+        clearInterval(this.holdTimer);
+        this.setState({ rot: this.state.rot + 30 }); this.notch();
+        this.holdTimer = setInterval(() => { this.setState({ rot: this.state.rot + 30 }); this.notch(); }, 170);
+      },
+      holdStop: () => clearInterval(this.holdTimer),
+      holdKey: (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.audio(); this.setState({ rot: this.state.rot + 30 }); this.notch(); }
+      },
+      flip: () => {
+        if (current === 'tourbillon') {
+          this.repeater();
+          this.setState({ phase: 'ringing', caption: 'Répétition minutes : 3 h 47.' });
+          this.ringTimer = setTimeout(() => { this.swish(); this.setState({ phase: 'reveal', shown: true, caption: 'Grand Feu. Tourbillon, 1 % des tirages.' }); }, 5600);
+          return;
+        }
+        if (current === 'quantieme') { this.gong(1180, 0); this.setState({ shown: true, caption: 'Timbre : un coup. Cloisonné, 4 % des tirages.' }); return; }
+        this.swish();
+        this.setState({ shown: true, caption: 'Carte révélée.' });
+      },
+      next: () => {
+        if (last) { this.setState({ phase: 'done', caption: '' }); return; }
+        this.setState({ idx: s.idx + 1, shown: false, caption: '' });
+      },
+      restart: () => this.setState({ phase: 'wind', notches: 0, rot: 0, idx: 0, shown: false, caption: 'Prêt. La couronne attend.' })
+    };
+  }
+}
+</script>
+</body>
+</html>

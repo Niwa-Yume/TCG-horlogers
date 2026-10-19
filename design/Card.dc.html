@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Carte WristMasters</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Belleza&amp;family=IM+Fell+English:ital@0;1&amp;family=Pinyon+Script&amp;display=swap">
+<style>
+body{margin:0}
+.wm-min{transform-box:view-box;transform-origin:126px 176px;animation:wm-tick 3600s linear infinite}
+@keyframes wm-tick{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.wm-min{animation:none}}
+</style>
+</helmet>
+<div role="img" aria-label="{{aria}}" style="position: relative; width: 252px; height: 352px; overflow: hidden; border-radius: 12px; background: {{t.box}}; color: {{t.ink}}; font-family: 'IM Fell English', 'Iowan Old Style', Georgia, serif">
+
+<sc-if value="{{isFront}}" hint-placeholder-val="{{ true }}">
+<sc-if value="{{is.echappement}}" hint-placeholder-val="{{ true }}">
+<img src="../assets/dials/cadran-londres-1755.webp" alt="" style="position: absolute; left: 24.5px; top: 32.7px; width: 203px; height: 286.6px; object-fit: cover; background: {{t.ground}}">
+</sc-if>
+<sc-if value="{{is.chronometre}}" hint-placeholder-val="{{ false }}">
+<img src="../assets/dials/cadran-en-mer-1761.webp" alt="" style="position: absolute; left: 24.5px; top: 32.7px; width: 203px; height: 286.6px; object-fit: cover; background: {{t.ground}}">
+</sc-if>
+<sc-if value="{{is.spiral}}" hint-placeholder-val="{{ false }}">
+<img src="../assets/dials/cadran-paris-1795.webp" alt="" style="position: absolute; left: 24.5px; top: 32.7px; width: 203px; height: 286.6px; object-fit: cover; background: {{t.ground}}">
+</sc-if>
+<sc-if value="{{is.quantieme}}" hint-placeholder-val="{{ false }}">
+<img src="../assets/dials/cadran-londres-1762.webp" alt="" style="position: absolute; left: 24.5px; top: 32.7px; width: 203px; height: 286.6px; object-fit: cover; background: {{t.ground}}">
+</sc-if>
+<sc-if value="{{is.tourbillon}}" hint-placeholder-val="{{ false }}">
+<img src="../assets/dials/cadran-paris-1801.webp" alt="" style="position: absolute; left: 24.5px; top: 32.7px; width: 203px; height: 286.6px; object-fit: cover; background: {{t.ground}}">
+</sc-if>
+</sc-if>
+
+<svg width="252" height="352" viewBox="0 0 252 352" aria-hidden="true" style="position: absolute; inset: 0">
+<defs>
+<linearGradient id="cs-{{k}}" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="{{t.bz1}}"></stop><stop offset="0.08" stop-color="{{t.bz0}}"></stop><stop offset="0.2" stop-color="{{t.bz1}}"></stop>
+<stop offset="0.36" stop-color="{{t.bz3}}"></stop><stop offset="0.47" stop-color="{{t.bz2}}"></stop><stop offset="0.56" stop-color="{{t.bz0}}"></stop>
+<stop offset="0.66" stop-color="{{t.bz1}}"></stop><stop offset="0.84" stop-color="{{t.bz3}}"></stop><stop offset="1" stop-color="{{t.bz2}}"></stop>
+</linearGradient>
+<linearGradient id="cb-{{k}}" x1="1" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="{{t.bz3}}"></stop><stop offset="0.3" stop-color="{{t.bz1}}"></stop><stop offset="0.5" stop-color="{{t.bz0}}"></stop>
+<stop offset="0.7" stop-color="{{t.bz2}}"></stop><stop offset="1" stop-color="{{t.bz0}}"></stop>
+</linearGradient>
+<linearGradient id="cr-{{k}}" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="{{t.bz2}}"></stop><stop offset="0.25" stop-color="{{t.bz0}}"></stop><stop offset="0.5" stop-color="{{t.bz1}}"></stop><stop offset="1" stop-color="{{t.bz3}}"></stop>
+</linearGradient>
+<linearGradient id="pl-{{k}}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="{{t.pl0}}"></stop><stop offset="0.55" stop-color="{{t.pl1}}"></stop><stop offset="1" stop-color="{{t.pl0}}"></stop></linearGradient>
+<radialGradient id="spot-{{k}}" cx="70" cy="40" r="300" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.10"></stop><stop offset="1" stop-color="#000000" stop-opacity="0.28"></stop></radialGradient>
+<linearGradient id="sheen-{{k}}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity="0.16"></stop><stop offset="0.34" stop-color="#FFFFFF" stop-opacity="0.03"></stop><stop offset="0.35" stop-color="#FFFFFF" stop-opacity="0"></stop><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"></stop></linearGradient>
+<filter id="leather-{{k}}" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="7"></feTurbulence><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.9 -0.28"></feColorMatrix></filter>
+<filter id="pebble-{{k}}" x="0" y="0" width="100%" height="100%"><feTurbulence type="turbulence" baseFrequency="0.32" numOctaves="2" seed="3"></feTurbulence><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 -0.9 0.42"></feColorMatrix></filter>
+<filter id="soft-{{k}}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="5"></feGaussianBlur></filter>
+<filter id="hsh-{{k}}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="0.9"></feGaussianBlur></filter>
+<filter id="ish-{{k}}" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="2.6"></feGaussianBlur></filter>
+<mask id="hole-{{k}}" maskUnits="userSpaceOnUse" x="0" y="0" width="252" height="352"><rect width="252" height="352" fill="#FFFFFF"></rect><path d="{{dial}}" fill="#000000"></path></mask>
+<clipPath id="dc-{{k}}"><path d="{{dial}}"></path></clipPath>
+</defs>
+
+<g mask="url(#hole-{{k}})">
+<rect width="252" height="352" fill="{{t.box}}"></rect>
+<rect width="252" height="352" filter="url(#pebble-{{k}})" opacity="0.07"></rect>
+<rect width="252" height="352" filter="url(#leather-{{k}})" opacity="0.5"></rect>
+<rect width="252" height="352" fill="url(#spot-{{k}})"></rect>
+<rect x="7.5" y="7.5" width="237" height="337" rx="10" fill="none" stroke="#000000" stroke-opacity="0.5" stroke-width="0.9" stroke-dasharray="2.6 1.7" transform="translate(0.4 0.7)"></rect>
+<rect x="7.5" y="7.5" width="237" height="337" rx="10" fill="none" stroke="{{t.stitch}}" stroke-width="0.8" stroke-dasharray="2.6 1.7" stroke-linecap="round"></rect>
+<path d="{{caseOuter}}" fill="#000000" opacity="0.6" filter="url(#soft-{{k}})" transform="translate(2 6)"></path>
+<path d="M236 171.4L241 171.4L241 180.6L236 180.6Z" fill="url(#cr-{{k}})"></path>
+<path d="{{crown}}" fill="url(#cr-{{k}})"></path>
+<path d="{{crownFlutes}}" stroke="{{t.bz3}}" stroke-width="0.5" opacity="0.75" fill="none"></path>
+<path d="{{crownFlutesHi}}" stroke="{{t.bz0}}" stroke-width="0.35" opacity="0.8" fill="none"></path>
+<path d="{{caseOuter}}" fill="url(#cs-{{k}})"></path>
+<path d="{{caseOuter}}" fill="none" stroke="{{t.bz3}}" stroke-width="0.6"></path>
+<path d="{{caseBevel}}" fill="url(#cb-{{k}})"></path>
+<path d="{{caseFacet}}" fill="url(#cs-{{k}})"></path>
+<path d="{{caseFacet}}" fill="none" stroke="{{t.bz0}}" stroke-width="0.45" opacity="0.9"></path>
+<path d="{{flange}}" fill="{{t.bz3}}"></path>
+<path d="{{caseHi}}" fill="none" stroke="#FFFFFF" stroke-width="1.1" stroke-linecap="round" opacity="0.55" filter="url(#hsh-{{k}})"></path>
+</g>
+
+<sc-if value="{{isFront}}" hint-placeholder-val="{{ true }}">
+<g clip-path="url(#dc-{{k}})">
+<path d="{{dial}}" fill="none" stroke="#000000" stroke-width="7" opacity="0.55" filter="url(#ish-{{k}})"></path>
+<g transform="translate(206 236)" fill="none" stroke="{{t.ink}}" stroke-width="0.4" opacity="0.7"><path d="M0 -4 L3.5 -2 L3.5 2 L0 4 L-3.5 2 L-3.5 -2 Z"></path><text x="0" y="1" text-anchor="middle" font-size="2.8" font-family="Belleza, sans-serif" fill="{{t.ink}}" stroke="none">WM</text></g>
+<sc-if value="{{hasFocus}}" hint-placeholder-val="{{ false }}">
+<circle cx="126" cy="270" r="30" fill="{{t.sub}}" opacity="0.94"></circle>
+<circle cx="126" cy="270" r="30" fill="none" stroke="{{t.hand1}}" stroke-width="1.2"></circle>
+<circle cx="126" cy="270" r="26.5" fill="none" stroke="{{t.subInk}}" stroke-width="0.3"></circle>
+<path d="{{subTicks}}" stroke="{{t.subInk}}" stroke-width="0.6" fill="none"></path>
+<path d="{{subArc}}" stroke="{{t.hand1}}" stroke-width="2.2" fill="none" stroke-linecap="round"></path>
+</sc-if>
+<g transform="translate(1.2 2.4)" filter="url(#hsh-{{k}})" opacity="0.4"><path d="{{hourAll}}" fill="#000000"></path><g class="wm-min"><path d="{{minAll}}" fill="#000000"></path></g></g>
+<path d="{{hourL}}" fill="{{t.hand0}}"></path><path d="{{hourR}}" fill="{{t.hand1}}"></path>
+<g class="wm-min"><path d="{{minL}}" fill="{{t.hand0}}"></path><path d="{{minR}}" fill="{{t.hand1}}"></path></g>
+<circle cx="126" cy="176" r="3.4" fill="{{t.hand1}}"></circle>
+<circle cx="126" cy="176" r="2.2" fill="{{t.hand0}}"></circle>
+<circle cx="125.4" cy="175.4" r="0.7" fill="#FFFFFF" opacity="0.7"></circle>
+<rect width="252" height="352" fill="url(#sheen-{{k}})"></rect>
+</g>
+</sc-if>
+
+<sc-if value="{{isBack}}" hint-placeholder-val="{{ false }}">
+<g clip-path="url(#dc-{{k}})">
+<rect width="252" height="352" fill="url(#pl-{{k}})"></rect>
+<path d="{{guilloche}}" fill="none" stroke="{{t.plText}}" stroke-width="0.32" opacity="0.26"></path>
+<path d="{{dial}}" fill="none" stroke="#000000" stroke-width="6" opacity="0.35" filter="url(#ish-{{k}})"></path>
+<rect width="252" height="352" fill="url(#sheen-{{k}})"></rect>
+</g>
+<g transform="translate(126 296)" fill="none" stroke="{{t.plText}}" stroke-width="0.5"><path d="M0 -6 L5.2 -3 L5.2 3 L0 6 L-5.2 3 L-5.2 -3 Z"></path><text x="0" y="1.6" text-anchor="middle" font-size="4.2" font-family="Belleza, sans-serif" fill="{{t.plText}}" stroke="none">WM</text></g>
+</sc-if>
+</svg>
+
+<sc-if value="{{isFront}}" hint-placeholder-val="{{ true }}">
+<div style="position: absolute; left: 40px; right: 40px; top: 50px; display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center; font-family: Belleza, 'Gill Sans', sans-serif; text-shadow: {{t.halo}}">
+<span style="font-size: 8px; letter-spacing: 0.28em; padding-left: 0.28em">WRISTMASTERS</span>
+<span style="font-size: 4.6px; letter-spacing: 0.5em; padding-left: 0.5em; opacity: 0.9">SÉRIE I · {{c.typeCaps}}</span>
+</div>
+<sc-if value="{{noFocus}}" hint-placeholder-val="{{ true }}">
+<span style="position: absolute; left: 150px; top: 252px; transform: rotate(-7deg); transform-origin: left center; font-family: 'Pinyon Script', cursive; font-size: 11px; line-height: 1; color: {{t.inkB}}; text-shadow: {{t.haloB}}">{{c.label}}</span>
+<div style="position: absolute; left: 36px; right: 36px; top: 272px; display: flex; flex-direction: column; align-items: center; gap: 1px; text-align: center; color: {{t.inkB}}; text-shadow: {{t.haloB}}">
+<span style="font-size: {{capSize}}; line-height: 1.05; text-wrap: balance">{{c.cap}}</span>
+<span style="font-style: italic; font-size: 8.6px; font-variant-numeric: oldstyle-nums">{{c.where}}</span>
+</div>
+</sc-if>
+<sc-if value="{{hasFocus}}" hint-placeholder-val="{{ false }}">
+<span style="position: absolute; left: 96px; width: 60px; top: 254px; text-align: center; font-size: 30px; line-height: 1; color: {{t.subInk}}">{{focusValue}}</span>
+<span style="position: absolute; left: 96px; width: 60px; top: 283px; text-align: center; font-family: Belleza, sans-serif; font-size: 4.4px; letter-spacing: 0.3em; padding-left: 0.3em; color: {{t.subInk}}">{{focusLabel}}</span>
+</sc-if>
+</sc-if>
+
+<sc-if value="{{isBack}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; left: 44px; right: 44px; top: 58px; display: flex; flex-direction: column; align-items: center; gap: 5px; text-align: center; color: {{t.plText}}">
+<span style="font-family: Belleza, sans-serif; font-size: 5.6px; letter-spacing: 0.4em; padding-left: 0.4em">N° {{serial}} · 0512</span>
+<span style="font-size: 13px; line-height: 1.1; text-wrap: balance">{{c.name}}</span>
+<span style="font-style: italic; font-size: 9.5px">{{c.who}}, {{c.year}}</span>
+<div style="width: 100%; margin-top: 9px; display: flex; flex-direction: column; gap: 4px">
+<sc-for list="{{stats}}" as="s" hint-placeholder-count="5">
+<div style="display: flex; align-items: baseline; gap: 4px; font-size: 10.5px">
+<span>{{s.label}}</span>
+<span style="flex: 1; border-bottom: 0.5px dotted {{t.plText}}; transform: translateY(-3px)"></span>
+<span style="font-size: 12.5px">{{s.value}}</span>
+</div>
+</sc-for>
+</div>
+<span style="margin-top: 8px; font-family: 'Pinyon Script', cursive; font-size: 12px; line-height: 1">{{c.label}}</span>
+<span style="font-size: 6.5px; opacity: 0.85">Cadran : {{c.where}} · Texte : Wikipédia, CC BY-SA</span>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"card":{"editor":"enum","options":["echappement","chronometre","spiral","quantieme","tourbillon"],"default":"echappement"},"focus":{"editor":"enum","options":["","precision","complication","innovation","prestige","heritage"],"default":""},"face":{"editor":"enum","options":["front","back"],"default":"front"},"$preview":{"width":252,"height":352}}'>
+class Component extends DCLogic {
+  renderVals() {
+    // Chaque carte : un cadran peint (miniature calculée, sans IA), un lieu, une date.
+    const CARDS = {
+      echappement: { name: 'Échappement à ancre', cap: 'L’échappement à ancre', where: 'Londres, vers 1755', type: 'Invention', year: 'vers 1755', who: 'Thomas Mudge', rarity: 'GRAVURE', label: 'Gravure', stats: [6, 2, 6, 2, 4], serial: '0141' },
+      chronometre: { name: 'Chronomètre de marine', cap: 'Le chronomètre de marine', where: 'En mer, 1761', type: 'Invention', year: '1759', who: 'John Harrison, H4', rarity: 'MARQUETERIE', label: 'Marqueterie', stats: [8, 3, 6, 3, 4], serial: '0218' },
+      spiral: { name: 'Spiral Breguet', cap: 'Le spiral Breguet', where: 'Paris, 1795', type: 'Invention', year: '1795', who: 'Abraham-Louis Breguet', rarity: 'GRISAILLE', label: 'Grisaille', stats: [7, 4, 7, 5, 5], serial: '0307' },
+      quantieme: { name: 'Quantième perpétuel', cap: 'Le quantième perpétuel', where: 'Londres, 1762', type: 'Complication', year: '1762', who: 'Thomas Mudge', rarity: 'CLOISONNE', label: 'Cloisonné', stats: [5, 9, 7, 6, 5], serial: '0389' },
+      tourbillon: { name: 'Tourbillon', cap: 'Le tourbillon', where: 'Paris, 1801', type: 'Complication', year: '1801', who: 'Abraham-Louis Breguet', rarity: 'GRAND_FEU', label: 'Grand Feu', stats: [7, 8, 8, 9, 4], serial: '0427' }
+    };
+    // Boîtier, écrin et encre par technique (rareté).
+    const THEMES = {
+      GRAVURE: { box: '#141A26', stitch: '#3A4866', bz0: '#FAFAF8', bz1: '#C7CBCE', bz2: '#7B8086', bz3: '#3B3F44', ground: '#EFE7D6', ink: '#2A2018', halo: '0 0 3px rgba(239,231,214,0.75)', inkB: '#2A2018', haloB: '0 0 3px rgba(239,231,214,0.9)', hand0: '#4A66A8', hand1: '#16224A', sub: '#EFE7D6', subInk: '#2A2018', pl0: '#F2F2F0', pl1: '#B9BDC1', plText: '#25282B' },
+      MARQUETERIE: { box: '#22130F', stitch: '#5A3426', bz0: '#FFEDE1', bz1: '#E8B396', bz2: '#A8664A', bz3: '#5C3222', ground: '#C99D66', ink: '#2B170B', halo: '0 0 3px rgba(240,215,170,0.9)', inkB: '#F6EAD0', haloB: '0 0 3px rgba(43,23,11,0.95)', hand0: '#FFE4D2', hand1: '#9C5A3E', sub: '#E9CFA6', subInk: '#2B170B', pl0: '#F6D9C6', pl1: '#C9907A', plText: '#3A2216' },
+      GRISAILLE: { box: '#0C0C0E', stitch: '#34353A', bz0: '#F4F4F2', bz1: '#B3B7BB', bz2: '#62666B', bz3: '#2B2D30', ground: '#141416', ink: '#EEE8DC', halo: '0 0 3px rgba(10,10,12,0.9)', inkB: '#EEE8DC', haloB: '0 0 3px rgba(10,10,12,0.9)', hand0: '#F7F7F5', hand1: '#8E9399', sub: '#141416', subInk: '#EEE8DC', pl0: '#5D5F63', pl1: '#26282B', plText: '#ECE6DA' },
+      CLOISONNE: { box: '#0E1838', stitch: '#2C3C70', bz0: '#FFF4CC', bz1: '#E6C26A', bz2: '#A97E2A', bz3: '#5A3F10', ground: '#13295A', ink: '#F4DFA0', halo: '0 0 3px rgba(8,18,48,0.9)', inkB: '#F4DFA0', haloB: '0 0 3px rgba(8,18,48,0.9)', hand0: '#FFF0BE', hand1: '#B88A30', sub: '#13295A', subInk: '#F4DFA0', pl0: '#F7E3A6', pl1: '#CFA552', plText: '#3B2A0A' },
+      GRAND_FEU: { box: '#0D2119', stitch: '#2A4A3A', bz0: '#FFF4CC', bz1: '#E6C26A', bz2: '#A97E2A', bz3: '#5A3F10', ground: '#F3E9D6', ink: '#1F2436', halo: '0 0 3px rgba(225,232,245,0.8)', inkB: '#FBF1DE', haloB: '0 0 3px rgba(30,38,66,0.9)', hand0: '#FFF0BE', hand1: '#9A7224', sub: '#F6EEDC', subInk: '#2E1F12', pl0: '#F7E3A6', pl1: '#CFA552', plText: '#3B2A0A' }
+    };
+    const KEYS = ['precision', 'complication', 'innovation', 'prestige', 'heritage'];
+    const LONG = ['Précision', 'Complication', 'Innovation', 'Prestige', 'Héritage'];
+
+    const key = CARDS[this.props.card] ? this.props.card : 'echappement';
+    const c = CARDS[key];
+    const t = THEMES[c.rarity];
+    const focus = this.props.focus ?? '';
+    const fi = KEYS.indexOf(focus);
+    const back = this.props.face === 'back';
+
+    // ---------- géométrie ----------
+    const r2 = (n) => Math.round(n * 100) / 100;
+    const P = (cx, cy, r, d) => { const a = d * Math.PI / 180; return [r2(cx + r * Math.sin(a)), r2(cy - r * Math.cos(a))]; };
+    const pt = (p) => p[0] + ' ' + p[1];
+    const circ = (cx, cy, r) => 'M' + r2(cx - r) + ' ' + cy + 'a' + r + ' ' + r + ' 0 1 1 ' + r2(2 * r) + ' 0a' + r + ' ' + r + ' 0 1 1 ' + r2(-2 * r) + ' 0Z';
+    const poly = (pts) => 'M' + pts.map(pt).join('L') + 'Z';
+    const ticks = (cx, cy, r0, r1, n, from, to) => { let d = ''; const step = (to - from) / n; for (let i = 0; i <= n; i++) { const a = from + i * step; d += 'M' + pt(P(cx, cy, r0, a)) + 'L' + pt(P(cx, cy, r1, a)); } return d; };
+    // coussin : rectangle aux flancs bombés (b) et aux coins arrondis (r)
+    const cushion = (x0, y0, x1, y1, r, b) => {
+      const w = x1 - x0, h = y1 - y0, dx = (w - 2 * r) / 3, dy = (h - 2 * r) / 3;
+      return 'M' + r2(x0 + r) + ' ' + y0 + 'C' + r2(x0 + r + dx) + ' ' + r2(y0 - b) + ' ' + r2(x1 - r - dx) + ' ' + r2(y0 - b) + ' ' + r2(x1 - r) + ' ' + y0 +
+        'Q' + x1 + ' ' + y0 + ' ' + x1 + ' ' + r2(y0 + r) +
+        'C' + r2(x1 + b) + ' ' + r2(y0 + r + dy) + ' ' + r2(x1 + b) + ' ' + r2(y1 - r - dy) + ' ' + x1 + ' ' + r2(y1 - r) +
+        'Q' + x1 + ' ' + y1 + ' ' + r2(x1 - r) + ' ' + y1 +
+        'C' + r2(x1 - r - dx) + ' ' + r2(y1 + b) + ' ' + r2(x0 + r + dx) + ' ' + r2(y1 + b) + ' ' + r2(x0 + r) + ' ' + y1 +
+        'Q' + x0 + ' ' + y1 + ' ' + x0 + ' ' + r2(y1 - r) +
+        'C' + r2(x0 - b) + ' ' + r2(y1 - r - dy) + ' ' + r2(x0 - b) + ' ' + r2(y0 + r + dy) + ' ' + x0 + ' ' + r2(y0 + r) +
+        'Q' + x0 + ' ' + y0 + ' ' + r2(x0 + r) + ' ' + y0 + 'Z';
+    };
+    // aiguille dauphine facettée : deux demi-losanges, l'un clair, l'autre sombre
+    const C = [126, 176];
+    const dauph = (deg, len, w, tail) => {
+      const T = P(C[0], C[1], tail, deg + 180), Lp = P(C[0], C[1], w, deg - 90), Rp = P(C[0], C[1], w, deg + 90), Tip = P(C[0], C[1], len, deg);
+      return { L: poly([T, Lp, Tip]), R: poly([T, Tip, Rp]), all: poly([T, Lp, Tip, Rp]) };
+    };
+    const hour = dauph(304.5, 36, 2.6, 8);
+    const min = dauph(54, 56, 2.1, 10);
+
+    const caseOuter = cushion(15, 26, 237, 326, 66, 3);
+    const caseBevel = cushion(19.5, 30.5, 232.5, 321.5, 62, 2.8);
+    const caseFacet = cushion(21.6, 32.6, 230.4, 319.4, 60, 2.6);
+    const flange = cushion(23.6, 34.6, 228.4, 317.4, 58, 2.5);
+    const dial = cushion(25.2, 36.2, 226.8, 315.8, 56.5, 2.4);
+    // reflets du poli : deux traits sur l'arête haute gauche
+    const caseHi = 'M30 52 Q32 34 58 28.5 M18.5 120 Q16.6 160 17.6 196';
+    let crownFlutes = '', crownFlutesHi = '';
+    for (let y = 167.2; y <= 185; y += 1.6) { crownFlutes += 'M241.5 ' + r2(y) + 'L248.6 ' + r2(y); crownFlutesHi += 'M241.5 ' + r2(y + 0.6) + 'L248.2 ' + r2(y + 0.6); }
+    let guilloche = '';
+    for (let r = 5; r < 160; r += 2.4) guilloche += circ(126, 196, r);
+    const vAngle = fi >= 0 ? -135 + (c.stats[fi] / 10) * 270 : -135;
+    const p0 = P(126, 270, 22.5, -135), p1 = P(126, 270, 22.5, vAngle);
+
+    return {
+      k: key, c: Object.assign({}, c, { typeCaps: c.type.toUpperCase() }), t,
+      is: { echappement: key === 'echappement', chronometre: key === 'chronometre', spiral: key === 'spiral', quantieme: key === 'quantieme', tourbillon: key === 'tourbillon' },
+      isFront: !back, isBack: back,
+      noFocus: fi < 0, hasFocus: fi >= 0,
+      focusValue: fi >= 0 ? c.stats[fi] : '',
+      focusLabel: fi >= 0 ? LONG[fi].toUpperCase() : '',
+      capSize: c.cap.length > 20 ? '11.5px' : '13.5px',
+      serial: c.serial,
+      stats: LONG.map((l, i) => ({ label: l, value: c.stats[i] })),
+      aria: c.name + ', ' + c.type.toLowerCase() + ', ' + c.year + ', ' + c.who + '. Cadran peint : ' + c.where + '. Rareté ' + c.label + '. ' + LONG.map((l, i) => l + ' ' + c.stats[i]).join(', ') + '.',
+      caseOuter, caseBevel, caseFacet, flange, dial, caseHi, guilloche,
+      crown: 'M241 167Q241 165.4 242.6 165.4L247.4 165.4Q249.4 165.4 249.4 168L249.4 184Q249.4 186.6 247.4 186.6L242.6 186.6Q241 186.6 241 185Z',
+      crownFlutes, crownFlutesHi,
+      hourL: hour.L, hourR: hour.R, hourAll: hour.all,
+      minL: min.L, minR: min.R, minAll: min.all,
+      subTicks: ticks(126, 270, 26.5, 29, 10, -135, 135),
+      subArc: 'M' + pt(p0) + 'A22.5 22.5 0 ' + (vAngle + 135 > 180 ? 1 : 0) + ' 1 ' + pt(p1)
+    };
+  }
+}
+</script>
+</body>
+</html>

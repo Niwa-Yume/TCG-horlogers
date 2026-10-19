@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Les cinq raretés</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders:wght@800;900&amp;family=Instrument+Serif:ital@0;1&amp;family=Instrument+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap">
+<style>
+body{margin:0;background:#121114}
+</style>
+</helmet>
+<div style="width: 1440px; height: 720px; box-sizing: border-box; padding: 44px 40px; background: #121114; color: #F2ECDF; font-family: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; gap: 32px">
+<h1 style="margin: 0; font-family: 'Big Shoulders', 'Arial Narrow', sans-serif; font-weight: 900; font-size: 84px; line-height: 0.86">LES CINQ RARETÉS.</h1>
+<p style="margin: 0; max-width: 56ch; color: #CFC8BB; font-size: 15px">Chaque carte est un cadran peint : un lieu, une date, une technique de métier d'art par rareté. Aucune IA, aucune image source : les miniatures sont calculées par script (modelé, touches de pinceau, placages, fils d'or), donc reproductibles sur tout le catalogue.</p>
+</div>
+<div style="display: flex; justify-content: space-between; gap: 24px">
+<sc-for list="{{tiers}}" as="t" hint-placeholder-count="5">
+<figure style="margin: 0; width: 252px; display: flex; flex-direction: column; gap: 12px">
+<dc-import name="Card" card="{{t.key}}" hint-size="252px,352px"></dc-import>
+<figcaption style="display: flex; flex-direction: column; gap: 4px; border-top: 1px solid #5C574F; padding-top: 10px">
+<div style="display: flex; justify-content: space-between; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px">
+<span>{{t.label}}</span>
+<span style="color: #CFC8BB">{{t.rate}}</span>
+</div>
+<span style="font-size: 13px; color: #CFC8BB">{{t.desc}}</span>
+</figcaption>
+</figure>
+</sc-for>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":720}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      tiers: [
+        { key: 'echappement', label: 'Gravure', rate: '60 %', desc: 'Aquatinte sépia sur émail ivoire, boîte acier.' },
+        { key: 'chronometre', label: 'Marqueterie', rate: '25 %', desc: 'Huit essences, ombrage au sable, or rose.' },
+        { key: 'spiral', label: 'Grisaille', rate: '10 %', desc: 'Blanc de Limoges sur émail noir, or gris.' },
+        { key: 'quantieme', label: 'Cloisonné', rate: '4 %', desc: 'Émaux cernés de fils d\'or, paillons.' },
+        { key: 'tourbillon', label: 'Grand Feu', rate: '1 %', desc: 'Miniature en couleurs, or jaune.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

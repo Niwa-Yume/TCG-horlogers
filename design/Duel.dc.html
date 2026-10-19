@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Duel</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders:wght@800;900&amp;family=Instrument+Serif:ital@0;1&amp;family=Instrument+Sans:wght@400;500;600&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap">
+<style>
+body{margin:0;background:#F2ECDF}
+a{color:#121114}a:hover{color:#213A9C}
+a:focus-visible,button:focus-visible{outline:2px solid #213A9C;outline-offset:3px}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; overflow: hidden; background: #F2ECDF; color: #121114; font-family: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif; display: flex; flex-direction: column">
+
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 20px; border-bottom: 1px solid #121114">
+<div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.04em">(Adversaire) Elo 1 204</span>
+<span style="font-weight: 600; font-size: 15px">horlo_du_dimanche</span>
+</div>
+<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px">
+<span aria-live="polite" style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px">{{oppStatus}}</span>
+<div aria-label="Réserve de l'adversaire : 1 cran sur 3" role="img" style="display: flex; gap: 3px">
+<span style="width: 10px; height: 14px; background: #121114"></span>
+<span style="width: 10px; height: 14px; border: 1px solid #121114; box-sizing: border-box"></span>
+<span style="width: 10px; height: 14px; border: 1px solid #121114; box-sizing: border-box"></span>
+</div>
+</div>
+</div>
+
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; border-bottom: 1px solid #121114; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px">
+<span>Manche 4 — 5</span>
+<div role="img" aria-label="Score : toi 2, adversaire 1" style="display: flex; align-items: center; gap: 4px">
+<span style="width: 16px; height: 16px; background: #121114"></span>
+<span style="width: 16px; height: 16px; border: 1px solid #121114; box-sizing: border-box; display: grid; place-items: center; font-size: 10px; line-height: 1">×</span>
+<span style="width: 16px; height: 16px; background: #121114"></span>
+<span style="width: 16px; height: 16px; border: 2px solid #213A9C; box-sizing: border-box"></span>
+<span style="width: 16px; height: 16px; border: 1px dashed #121114; box-sizing: border-box"></span>
+</div>
+<span>Toi 2 · 1 Adv.</span>
+</div>
+
+<div style="padding: 16px 20px 10px; display: flex; flex-direction: column; gap: 2px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em">(Critère tiré au sort)</span>
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px">
+<h1 style="margin: 0; font-family: 'Big Shoulders', 'Arial Narrow', sans-serif; font-weight: 900; font-size: 64px; line-height: 0.86">COMPLICATION</h1>
+</div>
+<div style="display: flex; align-items: baseline; justify-content: space-between; margin-top: 6px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 700; font-size: 30px; font-variant-numeric: tabular-nums; color: {{timerColor}}">{{timer}}</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; color: #4E4943">{{tickCaption}}</span>
+</div>
+</div>
+
+<div style="padding: 6px 20px 0">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em">(Ta main) 3 — 5</span>
+<div style="display: flex; justify-content: space-between; gap: 8px; margin-top: 10px; height: 176px; align-items: flex-end">
+<sc-for list="{{hand}}" as="h" hint-placeholder-count="3">
+<button type="button" onClick="{{h.pick}}" aria-pressed="{{h.pressed}}" aria-label="{{h.label}}" style="padding: 0; border: 0; background: transparent; cursor: pointer; width: 111px; height: 155px; transform: translateY({{h.lift}}px); transition: transform 380ms cubic-bezier(.2,1.3,.35,1); outline: {{h.ring}}; outline-offset: 3px">
+<div style="width: 111px; height: 155px; overflow: hidden; pointer-events: none">
+<div style="transform: scale(0.4405); transform-origin: top left; width: 252px; height: 352px">
+<dc-import name="Card" card="{{h.key}}" focus="complication" hint-size="252px,352px"></dc-import>
+</div>
+</div>
+</button>
+</sc-for>
+</div>
+</div>
+
+<div style="margin: 18px 20px 0; border-top: 1px solid #121114; padding-top: 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; letter-spacing: 0.06em">RÉSERVE DE MARCHE, EN SECRET</span>
+<div aria-hidden="true" style="display: flex; gap: 4px">
+<sc-for list="{{pips}}" as="p" hint-placeholder-count="3">
+<span style="width: 16px; height: 22px; box-sizing: border-box; border: 1px solid #121114; background: {{p.fill}}"></span>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 6px">
+<button type="button" onClick="{{less}}" aria-label="Retirer un cran" style="width: 44px; height: 44px; border: 1px solid #121114; background: transparent; color: #121114; font: inherit; font-size: 20px; cursor: pointer">−</button>
+<span aria-live="polite" style="min-width: 34px; text-align: center; font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 700; font-size: 18px">+{{engaged}}</span>
+<button type="button" onClick="{{more}}" aria-label="Engager un cran" style="width: 44px; height: 44px; border: 1px solid #121114; background: transparent; color: #121114; font: inherit; font-size: 20px; cursor: pointer">+</button>
+</div>
+</div>
+<p style="margin: 8px 20px 0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px">Valeur jouée : {{base}} + {{engaged}} = <strong>{{total}}</strong></p>
+
+<div style="margin: 14px 20px 0; display: flex; flex-direction: column; gap: 10px">
+<sc-if value="{{open}}" hint-placeholder-val="{{ true }}">
+<button type="button" onClick="{{lock}}" style="min-height: 52px; border: 0; background: #213A9C; color: #F2ECDF; font: inherit; font-weight: 600; font-size: 16px; cursor: pointer">Verrouiller mon choix</button>
+</sc-if>
+<sc-if value="{{locked}}" hint-placeholder-val="{{ false }}">
+<button type="button" disabled style="min-height: 52px; border: 1px solid #121114; background: transparent; color: #121114; font: inherit; font-weight: 600; font-size: 16px">Verrouillé. En attente de l'adversaire.</button>
+</sc-if>
+<div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px">
+<sc-for list="{{reactions}}" as="r" hint-placeholder-count="6">
+<button type="button" onClick="{{r.send}}" style="flex: none; min-height: 40px; padding: 0 12px; border: 1px solid #121114; background: {{r.bg}}; color: {{r.fg}}; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; cursor: pointer; white-space: nowrap">{{r.text}}</button>
+</sc-for>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { left: 17, pick: 'quantieme', engaged: 1, locked: false, step: 0, sent: '' };
+  }
+  componentDidMount() {
+    this.timer = setInterval(() => {
+      this.setState((s) => ({ left: s.left > 0 ? s.left - 1 : 30, step: (s.step + 1) % 4 }));
+    }, 1000);
+  }
+  componentWillUnmount() { clearInterval(this.timer); }
+  renderVals() {
+    const s = this.state;
+    const HAND = [
+      { key: 'quantieme', name: 'Quantième perpétuel', comp: 9 },
+      { key: 'spiral', name: 'Spiral Breguet', comp: 4 },
+      { key: 'chronometre', name: 'Chronomètre de marine', comp: 3 }
+    ];
+    const chosen = HAND.find((h) => h.key === s.pick) || HAND[0];
+    const dots = ['', '.', '..', '...'][s.step];
+    const REACT = ['Tic-tac…', 'Chapeau l\'artiste', 'Remonté à bloc', 'Bien réglé', 'Ça déraille', 'Grand Feu !'];
+    return {
+      timer: '00:' + String(s.left).padStart(2, '0'),
+      timerColor: s.left <= 5 ? '#213A9C' : '#121114',
+      tickCaption: s.left <= 5 ? 'Tic-tac accéléré' : 'Tic-tac',
+      oppStatus: s.sent ? 'Tu as envoyé : ' + s.sent : 'réfléchit' + dots,
+      hand: HAND.map((h) => ({
+        key: h.key,
+        label: h.name + ', complication ' + h.comp,
+        pressed: h.key === s.pick ? 'true' : 'false',
+        lift: h.key === s.pick ? -16 : 0,
+        ring: h.key === s.pick ? '2px solid #213A9C' : 'none',
+        pick: () => { if (!this.state.locked) this.setState({ pick: h.key }); }
+      })),
+      pips: [0, 1, 2].map((i) => ({ fill: i < 3 - s.engaged ? '#121114' : 'transparent' })),
+      engaged: s.engaged,
+      base: chosen.comp,
+      total: chosen.comp + s.engaged,
+      less: () => { if (!s.locked) this.setState({ engaged: Math.max(0, s.engaged - 1) }); },
+      more: () => { if (!s.locked) this.setState({ engaged: Math.min(3, s.engaged + 1) }); },
+      open: !s.locked,
+      locked: s.locked,
+      lock: () => this.setState({ locked: true }),
+      unlock: () => this.setState({ locked: false }),
+      reactions: REACT.map((t) => ({
+        text: t,
+        bg: s.sent === t ? '#121114' : 'transparent',
+        fg: s.sent === t ? '#F2ECDF' : '#121114',
+        send: () => this.setState({ sent: t })
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>
