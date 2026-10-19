@@ -1,0 +1,38 @@
+{
+  "_doc": "Fiche des planches : repères historiques et plage de dates valide. L'admin refuse une carte dont l'année du cadran sort de la plage.",
+  "londres-tamise": {
+    "script": "scene_londres2.py",
+    "technique": "GRAVURE",
+    "from": 1711,
+    "to": 1799,
+    "landmarks": ["Dôme de Saint-Paul (achevé en 1711)", "Flèches de Wren", "Trois-mâts de la Compagnie des Indes", "Costumes du XVIIIe siècle"]
+  },
+  "en-mer": {
+    "script": "scene_mer.py",
+    "technique": "MARQUETERIE",
+    "from": 1700,
+    "to": 1850,
+    "landmarks": ["Vaisseau à voiles carrées", "Aucun vapeur"]
+  },
+  "paris-notre-dame-nuit": {
+    "script": "scene_paris_nuit.py",
+    "technique": "GRISAILLE",
+    "from": 1792,
+    "to": 1858,
+    "landmarks": ["Notre-Dame sans flèche (déposée en 1792, rebâtie en 1859)", "Maisons de quai"]
+  },
+  "londres-fleet-street": {
+    "script": "scene_londres_nuit.py",
+    "technique": "CLOISONNE",
+    "from": 1711,
+    "to": 1799,
+    "landmarks": ["Flèche de St Bride (1703)", "Dôme de Saint-Paul (1711)", "Boutique de Thomas Mudge"]
+  },
+  "paris-quai-horloge": {
+    "script": "scene_paris_soir.py",
+    "technique": "GRAND_FEU",
+    "from": 1788,
+    "to": 1857,
+    "landmarks": ["Pont au Change sans maisons (démolies en 1788, pont reconstruit en 1858)", "Tour de l'Horloge", "Tours de la Conciergerie", "Bateau-lavoir"]
+  }
+}
