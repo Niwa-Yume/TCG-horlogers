@@ -1,0 +1,53 @@
+# Tests à chaque poussée ; les cadrans manquants (nouvelles cartes) sont peints et contrôlés.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: wristmasters
+          POSTGRES_PASSWORD: wristmasters
+          POSTGRES_DB: wristmasters
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U wristmasters" --health-interval 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://wristmasters:wristmasters@localhost:5432/wristmasters
+      SESSION_SECRET: ci-session-secret-0123456789abcdef0123456789
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm --filter @wm/api exec prisma migrate deploy
+      - run: pnpm --filter @wm/api seed
+      - run: pnpm test
+      - run: pnpm --filter @wm/api exec vitest run
+
+  dials:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12', cache: pip, cache-dependency-path: tools/dial-painter/requirements.txt }
+      - run: pip install -r tools/dial-painter/requirements.txt
+      # peint seulement les cadrans absents, puis contrôle les zones de texte de tous
+      - run: python3 tools/dial-painter/render.py --all --missing --jobs 4 --contact --check
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cadrans
+          path: |
+            assets/dials/*.webp
+            assets/dials/*.jpg
+          if-no-files-found: ignore
