@@ -5,6 +5,12 @@
 		reverse_proxy api:3000
 	}
 
+	# pages de partage avec balises Open Graph, rendues par l'API
+	handle /partage/* {
+		rewrite * /api{uri}
+		reverse_proxy api:3000
+	}
+
 	handle {
 		root * /srv
 		# fichiers Vite (nom haché) : cache permanent ; cadrans et sons : une semaine (même nom si regénérés)

@@ -24,6 +24,12 @@ services:
     environment:
       DATABASE_URL: postgresql://wristmasters:${POSTGRES_PASSWORD:-wristmasters}@postgres:5432/wristmasters
       ADMIN_TOKEN: ${ADMIN_TOKEN:?ADMIN_TOKEN manquant}
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET manquant}
+      PUBLIC_URL: ${PUBLIC_URL:-https://localhost}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:-}
       PORT: 3000
     depends_on:
       postgres: { condition: service_healthy }
@@ -38,7 +44,12 @@ services:
       postgres: { condition: service_healthy }
 
   caddy:
-    build: { context: ., dockerfile: docker/web.Dockerfile }
+    build:
+      context: .
+      dockerfile: docker/web.Dockerfile
+      args:
+        VITE_UMAMI_WEBSITE_ID: ${VITE_UMAMI_WEBSITE_ID:-}
+        VITE_UMAMI_SRC: ${VITE_UMAMI_SRC:-}
     restart: unless-stopped
     environment:
       DOMAIN: ${DOMAIN:-localhost}

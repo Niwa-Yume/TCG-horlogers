@@ -4,7 +4,8 @@ Jeu de cartes à collectionner en ligne, 100 % horlogerie, bilingue FR/EN, mobil
 Le brief complet est dans [`BRIEF_CLAUDE_CODE.md`](BRIEF_CLAUDE_CODE.md), son résumé dans [`CLAUDE.md`](CLAUDE.md),
 les maquettes de référence dans [`design/`](design).
 
-État : **Phase 1 terminée** (design system, catalogue, rendu des cartes, loupe, ingestion, questions, admin).
+État : **Phase 2 terminée** (premier contact sans compte, remontage et sonnerie, boosters et collection, connexion
+Google/Discord, partage). Phase 1 : design system, catalogue, cartes, loupe, ingestion, questions, admin.
 
 ## Démarrer en local
 
@@ -19,15 +20,20 @@ pnpm seed               # charge packages/ingest/data/cards.generated.json (vers
 pnpm dev                # api :3000 + web :5173
 ```
 
-- Catalogue : http://localhost:5173
+- Accueil : http://localhost:5173
+- Remonter un booster (sans compte) : http://localhost:5173/remonter
+- Album : http://localhost:5173/collection
+- Catalogue : http://localhost:5173/catalogue
 - Fiche carte et loupe : http://localhost:5173/carte/tourbillon
+- Page de partage (Open Graph) : http://localhost:5173/partage/c/tourbillon
 - Design system et les cinq raretés : http://localhost:5173/systeme
 - Admin (jeton `ADMIN_TOKEN` du `.env`) : http://localhost:5173/admin
 
 ## Production (VPS)
 
 ```bash
-cp .env.example .env    # puis : DOMAIN, STATS_DOMAIN, ADMIN_TOKEN, POSTGRES_PASSWORD, UMAMI_APP_SECRET
+cp .env.example .env    # puis : DOMAIN, STATS_DOMAIN, PUBLIC_URL, ADMIN_TOKEN, SESSION_SECRET, POSTGRES_PASSWORD,
+                        # UMAMI_APP_SECRET, et si besoin GOOGLE_*, DISCORD_*, VITE_UMAMI_*
 docker compose up -d --build
 docker compose exec api pnpm seed
 ```
@@ -40,7 +46,8 @@ caddy (front statique, cadrans et sons, HTTPS automatique, `/api/*` → api, `ST
 | Commande | Rôle |
 |---|---|
 | `pnpm dev` | API (tsx watch) + front (Vite) |
-| `pnpm test` | Vitest : rareté, stats, QCM, overrides, plages de planches |
+| `pnpm test` | Vitest : rareté, stats, recharge des boosters, tirage, QCM, overrides, plages de planches |
+| `pnpm --filter @wm/api test:db` | idem + test d'intégration du rattachement invité → compte (base requise) |
 | `pnpm typecheck` / `pnpm lint` / `pnpm format` | TypeScript strict, ESLint, Prettier |
 | `pnpm ingest` | Wikidata + Wikipédia + consultations → `packages/ingest/data/cards.generated.json` (cache dans `packages/ingest/.cache`) |
 | `pnpm seed` | Upsert des cartes et des QCM ; ne touche ni au statut, ni aux overrides, ni aux questions relues |
@@ -60,19 +67,49 @@ tools/dial-painter/.venv/bin/python tools/dial-painter/render.py --contact      
 Sorties : `assets/dials/<nom>.webp` (816 px), `<nom>-408.webp` (srcset) et `<nom>.jpg` (partage). Voir
 [`tools/dial-painter/README.md`](tools/dial-painter/README.md) et la fiche des planches `tools/dial-painter/plates.json`.
 
+## Connexion Google et Discord
+
+Facultative : sans identifiants, les boutons n'apparaissent pas et les cartes restent sur l'appareil (session invitée).
+
+- Google : console.cloud.google.com → API et services → Identifiants → ID client OAuth (application Web),
+  URI de redirection `<PUBLIC_URL>/api/auth/google/callback`, portée `profile` seulement.
+- Discord : discord.com/developers/applications → OAuth2, redirection `<PUBLIC_URL>/api/auth/discord/callback`,
+  portée `identify`.
+
+À la connexion, les cartes, les Rubis et l'historique de l'invité sont versés dans le compte.
+
+## Mesure (Umami)
+
+Créer le site dans Umami (`STATS_DOMAIN`), puis renseigner `VITE_UMAMI_WEBSITE_ID` et
+`VITE_UMAMI_SRC=https://<STATS_DOMAIN>/script.js` avant le build du front. Événements : `first_visit`,
+`first_card_revealed` (`seconds` depuis l'arrivée, cible < 20 s), `signup_after_first_booster`.
+`tutorial_duel_finished` arrive avec le duel (Phase 3).
+
 ## Structure
 
 ```
-apps/web            React + Vite : catalogue, fiche carte + loupe, design system, admin
-apps/api            NestJS (REST) : /api/cards, /api/admin/* ; seed
+apps/web            React + Vite : accueil, remontage, album, catalogue, fiche carte + loupe, design system, admin
+apps/api            NestJS (REST) : cartes, admin, session et connexion, boosters, collection, partage ; seed
 packages/ui         tokens, typo, grille, Marquee, SectionLabel, Counter, Button, Chip, StepTimer, Balance, MuteButton, SoundCaption, gestionnaire de sons
-packages/card-render <Card />, <FluidCard />, <Loupe />, <BoosterBack />, thèmes de rareté
+packages/card-render <Card />, <FluidCard />, <Loupe />, <BoosterBack />, thèmes de rareté, cardSvg() pour resvg
 packages/shared     types, rareté par percentiles, tirage, budgets de stats, PRNG déterministe
 packages/ingest     ingestion, QCM, flagship.overrides.json, data/cards.generated.json
 packages/engine     Phase 3
 tools/dial-painter  peintre de cadrans (Python), plates.json
 prisma/             schéma et migrations
 ```
+
+## Mesures (fin de Phase 2)
+
+Lighthouse 12, mobile simulé, build de production servi par Caddy (gzip), 19 octobre 2026 :
+
+| Page | Performance | Accessibilité | Bonnes pratiques | LCP | CLS |
+|---|---|---|---|---|---|
+| `/` accueil | 97 | 100 | 100 | 2,3 s | 0,071 |
+| `/remonter` | 98 | 100 | 100 | 2,3 s | 0 |
+| `/collection` | 95 | 100 | 100 | 2,8 s | 0 |
+
+JavaScript initial : 157 Ko gzip. Images de partage : 0,2 s (carré) à 0,3 s (story) par rendu, mises en cache.
 
 ## Mesures (fin de Phase 1)
 
@@ -113,3 +150,24 @@ reste à mesurer sur un téléphone moyen.
 - **Cadrans de référence** : les originaux sont conservés. Regénérés ici (numpy 2.5.4, scipy 1.18.1, Pillow 13), ils
   ont la même composition mais diffèrent au pixel près (écart moyen 0,4 à 10 / 255) ; le rendu est déterministe
   d'une exécution à l'autre. Versions désormais figées dans `requirements.txt`.
+
+### Phase 2
+
+- **Session invitée paresseuse** : `GET /api/me` ne crée rien ; l'invité naît au premier booster ouvert (ou à la
+  récompense du jour). Une visite sans geste ne laisse aucune ligne en base.
+- **Session** : JWT HS256 (`jose`) dans le cookie `wm_session` (httpOnly, SameSite=Lax, Secure en HTTPS, un an).
+  Passport sans session serveur ; le paramètre `state` d'OAuth vit dans un cookie de 10 minutes (CSRF de connexion).
+  `@nestjs/passport` n'est pas utilisé : `passport.authenticate` est appelé directement dans le contrôleur.
+- **Boosters** : recharge calculée à la lecture (`boosterState`, l'ancre ne court pas quand le stock est plein) ;
+  ouverture en transaction avec verrou de ligne (`SELECT … FOR UPDATE`) ; tirage `crypto.randomInt`, sans doublon
+  dans un paquet, la plus rare révélée en dernier ; le premier booster garantit une Grisaille.
+- **Économie** (configurable dans `packages/shared`) : recyclage Gravure 5, Marqueterie 10, Grisaille 25,
+  Cloisonné 60, Grand Feu 150 Rubis ; récompense quotidienne 20 Rubis (jour UTC). Chaque mouvement de Rubis
+  écrit une `LedgerEntry` dans la même transaction. Le recyclage garde l'exemplaire le plus ancien.
+- **Partage** : `cardSvg()` (recto en SVG pur, même géométrie et mêmes thèmes que `<Card />`) rendu par resvg avec
+  les polices de `assets/fonts` (instances statiques : resvg ignore les axes variables) et le cadran JPEG.
+  `/partage/i/<exemplaire>` et `/partage/c/<carte>` servent les balises Open Graph puis redirigent vers la carte.
+  PNG de 0,8 à 4 Mo (le grain du cuir compresse mal) ; cache mémoire de 200 images.
+- **Navigation** : en dessous de 900 px, barre de jeu en bas (Remonter, Album, Catalogue, Duel « bientôt ») comme
+  dans `Album.dc.html` ; le Duel et les Enchères ne sont pas des liens tant qu'ils n'existent pas.
+- **Accueil** : « Cinq cents cartes » de la maquette remplacé par le nombre réel de cartes du catalogue.

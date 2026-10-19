@@ -8,6 +8,8 @@ COPY packages/ui/package.json packages/ui/
 COPY packages/card-render/package.json packages/card-render/
 RUN pnpm install --frozen-lockfile --filter @wm/web... --filter wristmasters-tcg --ignore-scripts
 COPY . .
+ARG VITE_UMAMI_WEBSITE_ID=
+ARG VITE_UMAMI_SRC=
 RUN pnpm --filter @wm/web build
 
 FROM caddy:2-alpine
