@@ -17,7 +17,7 @@ const secret = () => {
 export const publicUrl = () => (process.env.PUBLIC_URL ?? 'http://localhost:5173').replace(/\/$/, '');
 const secure = () => publicUrl().startsWith('https://');
 
-export function readCookie(req: Request, name: string): string | null {
+export function readCookie(req: { headers: { cookie?: string } }, name: string): string | null {
   for (const part of (req.headers.cookie ?? '').split(';')) {
     const [k, ...v] = part.trim().split('=');
     if (k === name) return decodeURIComponent(v.join('='));
@@ -35,19 +35,24 @@ export function setCookie(res: Response, name: string, value: string, maxAgeSec:
   });
 }
 
+/** Identifiant de l'utilisateur du cookie de session (requêtes HTTP et poignée de main Socket.IO). */
+export async function sessionUserId(req: { headers: { cookie?: string } }): Promise<string | null> {
+  const token = readCookie(req, COOKIE);
+  if (!token) return null;
+  try {
+    const { payload } = await jwtVerify(token, secret(), { algorithms: ['HS256'] });
+    return typeof payload.sub === 'string' ? payload.sub : null;
+  } catch {
+    return null;
+  }
+}
+
 @Injectable()
 export class SessionService {
   constructor(@Inject(PrismaService) private db: PrismaService) {}
 
-  async userId(req: Request): Promise<string | null> {
-    const token = readCookie(req, COOKIE);
-    if (!token) return null;
-    try {
-      const { payload } = await jwtVerify(token, secret(), { algorithms: ['HS256'] });
-      return typeof payload.sub === 'string' ? payload.sub : null;
-    } catch {
-      return null;
-    }
+  userId(req: Request): Promise<string | null> {
+    return sessionUserId(req);
   }
 
   async user(req: Request): Promise<User | null> {
