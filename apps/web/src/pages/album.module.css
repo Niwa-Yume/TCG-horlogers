@@ -1,0 +1,136 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: var(--s3);
+}
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.rubis {
+  border: var(--rule);
+  padding: 6px 10px;
+  font-size: 12px;
+}
+.title {
+  font-size: clamp(52px, 8vw, 88px);
+}
+.banner {
+  border: var(--rule);
+  padding: 12px 14px;
+}
+.account,
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  border: 1px dashed var(--ink);
+  padding: 10px 12px;
+}
+.chips {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 8px;
+}
+.secHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.secHead h2 {
+  font-size: 24px;
+}
+.segments {
+  display: grid;
+  gap: 2px;
+}
+.segments span {
+  height: 6px;
+  border: var(--rule);
+}
+.segments span[data-on='true'] {
+  background: var(--ink);
+}
+.bar {
+  height: 6px;
+  border: var(--rule);
+}
+.bar span {
+  display: block;
+  height: 100%;
+  background: var(--ink);
+}
+.grid {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+@media (min-width: 700px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--s3);
+  }
+}
+.grid li {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 200px;
+}
+.cardLink {
+  position: relative;
+  display: block;
+  transition: transform var(--t-screen) var(--ease-spring);
+}
+.cardLink:hover {
+  transform: translateY(-4px) rotate(-1deg);
+}
+.count {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  padding: 2px 6px;
+  background: var(--paper);
+  border: var(--rule);
+  font-size: 11px;
+}
+.unknown {
+  aspect-ratio: 252 / 352;
+  border: 1px dashed var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+  padding: 4px;
+}
+
+.unknown span:last-child {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+}
+.q {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 40px;
+  line-height: 1;
+}
