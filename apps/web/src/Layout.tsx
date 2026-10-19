@@ -20,6 +20,7 @@ export function Layout() {
           <nav aria-label={t('nav.label')} className={`wm-mono ${s.nav}`}>
             <NavLink to="/collection">({t('nav2.collection')})</NavLink>
             <NavLink to="/catalogue">({t('nav.catalogue')})</NavLink>
+            <NavLink to="/duel">({t('nav2.duel')})</NavLink>
             <Link to="/#comment">({t('nav2.how')})</Link>
           </nav>
           <div className={s.tools}>
@@ -113,7 +114,7 @@ export function Layout() {
           </svg>
           <span>{t('nav.catalogue')}</span>
         </NavLink>
-        <span aria-disabled="true" className={s.disabled}>
+        <NavLink to="/duel">
           <svg
             width="22"
             height="22"
@@ -126,10 +127,8 @@ export function Layout() {
             <rect x="3" y="5" width="8" height="12" transform="rotate(-8 7 11)" />
             <rect x="13" y="5" width="8" height="12" transform="rotate(8 17 11)" />
           </svg>
-          <span>
-            {t('nav2.duel')} · {t('nav2.soon')}
-          </span>
-        </span>
+          <span>{t('nav2.duel')}</span>
+        </NavLink>
       </nav>
       <SoundCaption />
       <ScrollRestoration />

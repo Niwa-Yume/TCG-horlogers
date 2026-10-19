@@ -419,7 +419,7 @@ function Done({
         <div className={s.links}>
           <Link to={`/carte/${best.slug}?apprendre=1`}>{t('wind.inspect', { name: best.name })} →</Link>
           <Link to="/collection">{t('wind.album')}</Link>
-          <span className="wm-muted">{t('wind.tutorial')}</span>
+          <Link to="/duel/tutoriel">{t('wind.tutorial')} →</Link>
         </div>
       </div>
     </div>

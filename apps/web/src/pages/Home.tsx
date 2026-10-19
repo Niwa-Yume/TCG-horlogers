@@ -163,9 +163,14 @@ export function Home() {
           <p className="wm-mono">({t('nav2.duel')})</p>
           <p className={s.lead}>{t('home.duelText')}</p>
           <p className="wm-muted">{t('home.duelMore')}</p>
-          <span className={`${buttonClass('secondary', true)} ${s.soon}`} aria-disabled="true">
-            {t('home.duelSoon')}
-          </span>
+          <div className={s.ctas}>
+            <Link to="/duel/tutoriel" className={buttonClass('secondary', true)}>
+              {t('home.duelTry')} <span aria-hidden="true">→</span>
+            </Link>
+            <Link to="/duel" className={buttonClass('quiet', true)}>
+              {t('home.duelLive')}
+            </Link>
+          </div>
         </div>
       </section>
     </>

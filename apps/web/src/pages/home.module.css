@@ -215,8 +215,3 @@
   gap: 20px;
   min-width: 0;
 }
-.soon {
-  align-self: flex-start;
-  cursor: default;
-  opacity: 0.6;
-}

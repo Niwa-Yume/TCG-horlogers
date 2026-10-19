@@ -2,7 +2,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { cardResources } from '@wm/card-render';
 import { uiResources } from '@wm/ui';
-import { phase2 } from './locales';
+import { phase2, phase3 } from './locales';
 
 const app = {
   fr: {
@@ -246,8 +246,8 @@ const stored = (() => {
 
 void i18n.use(initReactI18next).init({
   resources: {
-    fr: { app: { ...app.fr, ...phase2.fr }, ui: uiResources.fr, card: cardResources.fr },
-    en: { app: { ...app.en, ...phase2.en }, ui: uiResources.en, card: cardResources.en },
+    fr: { app: { ...app.fr, ...phase2.fr, ...phase3.fr }, ui: uiResources.fr, card: cardResources.fr },
+    en: { app: { ...app.en, ...phase2.en, ...phase3.en }, ui: uiResources.en, card: cardResources.en },
   },
   lng: stored ?? (navigator.language.startsWith('fr') ? 'fr' : 'en'),
   fallbackLng: 'fr',
