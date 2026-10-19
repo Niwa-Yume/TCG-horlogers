@@ -36,6 +36,11 @@ const stateStore = {
 
 const name = (s: string | undefined, fallback: string) => (s?.trim() || fallback).slice(0, 32);
 
+const devLogin = () => process.env.DEV_LOGIN === '1' && !publicUrl().startsWith('https://');
+
+/** Boutons de connexion à proposer : Google et Discord s'ils sont configurés, « dev » en local. */
+export const loginProviders = (): string[] => [...configuredProviders(), ...(devLogin() ? ['dev'] : [])];
+
 export function configuredProviders() {
   return (['google', 'discord'] as const).filter(
     (p) => process.env[`${p.toUpperCase()}_CLIENT_ID`] && process.env[`${p.toUpperCase()}_CLIENT_SECRET`],
@@ -96,11 +101,30 @@ export class AuthController {
 
   @Get('providers')
   providers() {
-    return configuredProviders();
+    return loginProviders();
   }
 
   @Get(':provider')
-  start(@Param('provider') p: string, @Req() req: Request, @Res() res: Response, @Next() next: NextFunction) {
+  async start(
+    @Param('provider') p: string,
+    @Req() req: Request,
+    @Res() res: Response,
+    @Next() next: NextFunction,
+  ) {
+    // connexion de développement (DEV_LOGIN=1, jamais en production) : ?name=pseudo
+    if (p === 'dev' && devLogin()) {
+      const name =
+        String(req.query.name ?? 'dev')
+          .replace(/[^\w-]/g, '')
+          .slice(0, 24) || 'dev';
+      const user = await attachIdentity(this.db, await this.session.userId(req), {
+        provider: 'dev',
+        providerId: name,
+        name,
+      });
+      await this.session.signIn(res, user.id);
+      return res.redirect(`${publicUrl()}/collection?bienvenue=1`);
+    }
     if (!configuredProviders().includes(p as never)) throw new NotFoundException();
     passport.authenticate(p, { session: false })(req, res, next);
   }

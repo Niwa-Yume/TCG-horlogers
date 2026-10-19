@@ -2,7 +2,7 @@
 import type { PrismaClient, User } from '@prisma/client';
 
 export interface Identity {
-  provider: 'google' | 'discord';
+  provider: 'google' | 'discord' | 'dev';
   providerId: string;
   name: string;
 }

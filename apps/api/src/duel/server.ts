@@ -87,7 +87,7 @@ const power = (c: Card) => c.precision + c.complication + c.innovation + c.prest
 /** Le deck d'un joueur : ses 10 cartes distinctes les plus fortes (deck automatique). */
 export async function deckOf(db: PrismaClient, userId: string): Promise<Card[]> {
   const owned = await db.cardInstance.findMany({
-    where: { ownerId: userId, card: { status: 'ACTIVE' } },
+    where: { ownerId: userId, lock: null, card: { status: 'ACTIVE' } }, // pas de carte en vente ou en échange
     include: { card: true },
   });
   const distinct = [...new Map(owned.map((o) => [o.cardId, o.card])).values()];

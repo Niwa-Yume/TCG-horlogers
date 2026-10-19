@@ -8,6 +8,9 @@ import { AuthController, setupPassport } from './auth.controller';
 import { CardsController } from './cards.controller';
 import { DuelController } from './duel/duel.controller';
 import { DuelServer } from './duel/server';
+import { MarketController } from './market/market.controller';
+import { sweep } from './market/market';
+import { actionLimit } from './market/ratelimit';
 import { PlayerController } from './player.controller';
 import { PrismaService } from './prisma';
 import { SessionService } from './session';
@@ -21,6 +24,7 @@ import { ShareController } from './share.controller';
     PlayerController,
     ShareController,
     DuelController,
+    MarketController,
   ],
   providers: [PrismaService, SessionService],
 })
@@ -29,8 +33,14 @@ class AppModule {}
 setupPassport();
 const app = await NestFactory.create<NestExpressApplication>(AppModule);
 app.setGlobalPrefix('api');
+app.use(actionLimit);
 app.use(passport.initialize());
 app.set('trust proxy', 1); // derrière Caddy
 app.enableShutdownHooks();
 new DuelServer(app.get(PrismaService)).attach(app.getHttpServer());
+// enchères échues et échanges expirés : réglés toutes les 30 s (et à chaque lecture du marché)
+setInterval(
+  () => void sweep(app.get(PrismaService)).catch((e) => console.error('marché : ménage impossible', e)),
+  30_000,
+);
 await app.listen(Number(process.env.PORT ?? 3000));

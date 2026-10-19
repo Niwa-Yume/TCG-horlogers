@@ -26,7 +26,8 @@ import {
   type MeView,
   type PullView,
 } from '@wm/shared';
-import { configuredProviders } from './auth.controller';
+import { loginProviders } from './auth.controller';
+import { sellableAt } from './market/market';
 import { drawBooster } from './booster';
 import { langOf, toView } from './card-view';
 import { PrismaService } from './prisma';
@@ -47,7 +48,8 @@ export function toMe(u: User | null, now = new Date()): MeView {
       nextAt: null,
       boostersOpened: 0,
       dailyAvailable: false,
-      providers: configuredProviders(),
+      providers: loginProviders(),
+      sellableAt: null,
     };
   const st = boosterState(u.boosterStock, u.boosterRefill, now);
   return {
@@ -59,7 +61,8 @@ export function toMe(u: User | null, now = new Date()): MeView {
     nextAt: st.nextAt?.toISOString() ?? null,
     boostersOpened: u.boostersOpened,
     dailyAvailable: !u.lastDaily || day(u.lastDaily) !== day(now),
-    providers: configuredProviders(),
+    providers: loginProviders(),
+    sellableAt: sellableAt(u)?.toISOString() ?? null,
   };
 }
 
@@ -162,11 +165,14 @@ export class PlayerController {
     const groups = new Map<string, CollectionView['owned'][number]>();
     for (const i of instances) {
       const g = groups.get(i.cardId);
-      if (g) g.count++;
-      else
+      if (g) {
+        g.count++;
+        if (i.lock) g.locked++;
+      } else
         groups.set(i.cardId, {
           card: toView(i.card, langOf(lang), active.length),
           count: 1,
+          locked: i.lock ? 1 : 0,
           instanceId: i.id,
         });
     }
@@ -185,7 +191,7 @@ export class PlayerController {
     return this.db.$transaction(async (tx) => {
       await lock(tx, user.id);
       const instances = await tx.cardInstance.findMany({
-        where: { ownerId: user.id, ...(slug && { card: { slug } }) },
+        where: { ownerId: user.id, lock: null, ...(slug && { card: { slug } }) }, // jamais une carte en vente ou en échange
         select: { id: true, cardId: true, card: { select: { rarity: true } } },
         orderBy: { acquiredAt: 'asc' },
       });
