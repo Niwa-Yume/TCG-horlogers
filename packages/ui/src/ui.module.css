@@ -131,7 +131,7 @@
 .caption {
   position: fixed;
   left: 50%;
-  bottom: var(--s3);
+  bottom: calc(var(--s3) + var(--bottom-bar, 0px));
   transform: translateX(-50%);
   margin: 0;
   padding: 6px 12px;
