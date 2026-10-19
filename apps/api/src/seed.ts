@@ -1,0 +1,47 @@
+// Upsert de packages/ingest/data/cards.generated.json. Ne touche jamais aux champs d'admin
+// (status, override*) ni aux questions déjà relues.
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { PrismaClient, type Prisma } from '@prisma/client';
+
+const FILE = join(
+  import.meta.dirname,
+  '..',
+  '..',
+  '..',
+  'packages',
+  'ingest',
+  'data',
+  'cards.generated.json',
+);
+const db = new PrismaClient();
+type Generated = Record<string, unknown> & {
+  slug: string;
+  stats: Record<string, number>;
+  facts: unknown;
+  questions: (Omit<Prisma.QuestionCreateInput, 'card'> & { id: string })[];
+};
+const { cards } = JSON.parse(await readFile(FILE, 'utf8')) as { cards: Generated[] };
+
+let questions = 0;
+await db.$transaction(
+  async (tx) => {
+    // libère les numéros pour éviter les collisions transitoires sur la contrainte unique
+    await tx.card.updateMany({ data: { number: { multiply: -1 } } });
+    for (const { stats, facts: _f, questions: qs, ...c } of cards) {
+      const data = { ...c, ...stats } as Prisma.CardCreateInput;
+      const card = await tx.card.upsert({ where: { slug: c.slug }, create: data, update: data });
+      for (const q of qs) {
+        const existing = await tx.question.findUnique({ where: { id: q.id } });
+        if (existing && (existing.verified || existing.source === 'MANUAL')) continue;
+        await tx.question.upsert({ where: { id: q.id }, create: { ...q, cardId: card.id }, update: q });
+        questions++;
+      }
+    }
+    // cartes absentes du fichier (retirées de Wikidata) : on rend leur numéro, jamais réattribué par l'ingestion
+    await tx.$executeRaw`UPDATE "Card" SET number = -number WHERE number < 0`;
+  },
+  { timeout: 120_000 },
+);
+console.log(`${cards.length} cartes, ${questions} questions à jour`);
+await db.$disconnect();

@@ -1,0 +1,31 @@
+{
+  "name": "@wm/api",
+  "private": true,
+  "type": "module",
+  "prisma": {
+    "schema": "../../prisma/schema.prisma"
+  },
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=../../.env src/main.ts",
+    "start": "tsx src/main.ts",
+    "seed": "tsx --env-file-if-exists=../../.env src/seed.ts",
+    "prisma": "sh -c 'set -a; [ -f ../../.env ] && . ../../.env; set +a; exec prisma \"$@\"' --",
+    "test": "vitest run",
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.6",
+    "@nestjs/core": "^11.1.6",
+    "@nestjs/platform-express": "^11.1.6",
+    "@prisma/client": "6.19.3",
+    "@wm/shared": "workspace:*",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "tsx": "^4.20.6"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^22.18.0",
+    "prisma": "6.19.3"
+  }
+}
