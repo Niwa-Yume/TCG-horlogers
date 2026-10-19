@@ -9,6 +9,7 @@ import type {
   MeView,
   PullView,
   TradeView,
+  NotificationView,
 } from '@wm/shared';
 
 export class HttpError extends Error {
@@ -59,6 +60,9 @@ export const api = {
     request('/market/trades', post({ toId, offerIds, askIds })),
   decide: (id: string, action: 'accept' | 'decline' | 'cancel') =>
     request(`/market/trades/${id}/${action}`, post({})),
+  unread: () => request<{ unread: number }>('/market/notifications/count'),
+  notifications: (lang: Lang) => request<NotificationView[]>(`/market/notifications?lang=${lang}`),
+  markRead: () => request('/market/notifications/read', post({})),
 };
 
 export type FreeCard = CardView & { instanceId: string };
@@ -70,6 +74,16 @@ const post = (body: unknown): RequestInit => ({
 });
 
 export const useMe = () => useQuery({ queryKey: ['me'], queryFn: api.me });
+
+/** Avis non lus : relus toutes les 30 s tant que l'onglet est visible (pas de push : marche avec plusieurs processus). */
+export const useUnread = (enabled: boolean) =>
+  useQuery({
+    queryKey: ['unread'],
+    queryFn: api.unread,
+    enabled,
+    refetchInterval: 30_000,
+    select: (d) => d.unread,
+  });
 
 /** Partage natif (mobile), sinon copie du lien. Rend true si le lien a été copié. */
 export async function shareLink(title: string, url: string): Promise<boolean> {

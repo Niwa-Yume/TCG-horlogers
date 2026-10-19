@@ -1,7 +1,7 @@
 import { Link, NavLink, Outlet, ScrollRestoration } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { buttonClass, MuteButton, SoundCaption, StepTimer, useOnline } from '@wm/ui';
-import { useMe } from './api';
+import { useMe, useUnread } from './api';
 import s from './layout.module.css';
 
 export function Layout() {
@@ -9,6 +9,7 @@ export function Layout() {
   const online = useOnline();
   const me = useMe();
   const stock = me.data?.stock ?? 3;
+  const unread = useUnread(!!me.data?.exists && !me.data.isGuest).data ?? 0;
   return (
     <>
       <header className={s.header}>
@@ -33,6 +34,26 @@ export function Layout() {
             >
               {t('lang.switch')}
             </button>
+            {me.data?.exists && !me.data.isGuest && (
+              <Link
+                to="/notifications"
+                className={s.bell}
+                aria-label={unread ? t('notif.bellUnread', { count: unread }) : t('notif.bell')}
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  aria-hidden="true"
+                >
+                  <path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0" />
+                </svg>
+                {unread > 0 && <span className={`wm-mono ${s.badge}`}>{unread > 9 ? '9+' : unread}</span>}
+              </Link>
+            )}
             <MuteButton />
             <Link to="/remonter" className={`${buttonClass('primary')} ${s.cta}`}>
               {t('nav2.wind')} <span aria-hidden="true">→</span>

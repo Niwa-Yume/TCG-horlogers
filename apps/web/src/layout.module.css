@@ -154,3 +154,22 @@
     display: inline-flex;
   }
 }
+.bell {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: var(--rule);
+}
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  padding: 1px 4px;
+  background: var(--steel-blue);
+  color: var(--paper);
+  font-size: 10px;
+  text-align: center;
+}

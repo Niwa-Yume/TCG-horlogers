@@ -14,6 +14,7 @@ import { Home } from './pages/Home';
 import { Wind } from './pages/Wind';
 import { Album } from './pages/Album';
 import { Market } from './pages/Market';
+import { Notifications } from './pages/Notifications';
 import { initAnalytics } from './track';
 import { Balance } from '@wm/ui';
 
@@ -37,6 +38,7 @@ const router = createBrowserRouter([
       { path: '/remonter', element: <Wind /> },
       { path: '/collection', element: <Album /> },
       { path: '/encheres', element: <Market /> },
+      { path: '/notifications', element: <Notifications /> },
       { path: '/duel', element: later(<DuelPage />) },
       { path: '/duel/tutoriel', element: <Tutorial /> },
       { path: '/carte/:slug', element: <CardPage /> },

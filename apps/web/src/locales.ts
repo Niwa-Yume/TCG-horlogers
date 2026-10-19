@@ -684,3 +684,53 @@ export const phase4 = {
     },
   },
 };
+
+// Ajouts : notifications du marché
+export const notifTexts = {
+  fr: {
+    notif: {
+      label: 'Notifications',
+      title: 'Du nouveau.',
+      empty: 'Rien de neuf. Le comptoir est calme.',
+      new: 'nouveau',
+      open: 'Voir',
+      bell: 'Notifications',
+      bellUnread_one: '{{count}} notification non lue',
+      bellUnread_other: '{{count}} notifications non lues',
+      kinds: {
+        OUTBID: 'Surenchéri sur « {{card}} » : la mise est montée à {{n}} Rubis. Les tiens te sont rendus.',
+        AUCTION_WON: 'Adjugé : « {{card}} » est à toi pour {{n}} Rubis.',
+        AUCTION_SOLD: '« {{card}} » vendue {{n}} Rubis : {{net}} pour toi après la taxe.',
+        AUCTION_EXPIRED: '« {{card}} » n’a pas trouvé preneur : la carte t’est rendue.',
+        TRADE_RECEIVED: '{{from}} te propose un échange.',
+        TRADE_ACCEPTED: '{{from}} a accepté ton échange.',
+        TRADE_DECLINED: '{{from}} a refusé ton échange : tes cartes sont libres.',
+        TRADE_CANCELLED: '{{from}} a retiré sa proposition d’échange.',
+        TRADE_EXPIRED: 'Ton échange avec {{from}} a expiré : tes cartes sont libres.',
+      },
+    },
+  },
+  en: {
+    notif: {
+      label: 'Notifications',
+      title: 'What’s new.',
+      empty: 'Nothing new. The counter is quiet.',
+      new: 'new',
+      open: 'View',
+      bell: 'Notifications',
+      bellUnread_one: '{{count}} unread notification',
+      bellUnread_other: '{{count}} unread notifications',
+      kinds: {
+        OUTBID: 'Outbid on “{{card}}”: the bid is now {{n}} Rubies. Yours are returned.',
+        AUCTION_WON: 'Sold to you: “{{card}}” for {{n}} Rubies.',
+        AUCTION_SOLD: '“{{card}}” sold for {{n}} Rubies: {{net}} for you after tax.',
+        AUCTION_EXPIRED: '“{{card}}” found no taker: the card is back with you.',
+        TRADE_RECEIVED: '{{from}} offers you a trade.',
+        TRADE_ACCEPTED: '{{from}} accepted your trade.',
+        TRADE_DECLINED: '{{from}} declined your trade: your cards are free.',
+        TRADE_CANCELLED: '{{from}} withdrew their trade offer.',
+        TRADE_EXPIRED: 'Your trade with {{from}} expired: your cards are free.',
+      },
+    },
+  },
+};

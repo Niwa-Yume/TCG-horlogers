@@ -2,7 +2,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { cardResources } from '@wm/card-render';
 import { uiResources } from '@wm/ui';
-import { phase2, phase3, phase4 } from './locales';
+import { notifTexts, phase2, phase3, phase4 } from './locales';
 
 const app = {
   fr: {
@@ -247,12 +247,12 @@ const stored = (() => {
 void i18n.use(initReactI18next).init({
   resources: {
     fr: {
-      app: { ...app.fr, ...phase2.fr, ...phase3.fr, ...phase4.fr },
+      app: { ...app.fr, ...phase2.fr, ...phase3.fr, ...phase4.fr, ...notifTexts.fr },
       ui: uiResources.fr,
       card: cardResources.fr,
     },
     en: {
-      app: { ...app.en, ...phase2.en, ...phase3.en, ...phase4.en },
+      app: { ...app.en, ...phase2.en, ...phase3.en, ...phase4.en, ...notifTexts.en },
       ui: uiResources.en,
       card: cardResources.en,
     },
