@@ -1,0 +1,8 @@
+node_modules
+dist
+.env
+.cache
+*.tsbuildinfo
+tools/dial-painter/.venv
+__pycache__
+assets/dials/contact.jpg

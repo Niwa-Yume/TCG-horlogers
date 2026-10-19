@@ -1,0 +1,33 @@
+{
+  "name": "wristmasters-tcg",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.21.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @wm/web --filter @wm/api dev",
+    "build": "pnpm --filter @wm/web build",
+    "test": "pnpm -r --if-present test",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "db:up": "docker compose up -d postgres",
+    "db:migrate": "pnpm --filter @wm/api exec prisma migrate dev",
+    "ingest": "pnpm --filter @wm/ingest start",
+    "seed": "pnpm --filter @wm/api seed",
+    "dials": "tools/dial-painter/.venv/bin/python tools/dial-painter/render.py --all --jobs 4"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@prisma/client": "6.19.3",
+    "eslint": "^9.39.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "prettier": "^3.6.2",
+    "prisma": "6.19.3",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.46.0",
+    "vitest": "^3.2.7"
+  }
+}
