@@ -37,7 +37,7 @@ def heavens(sc, rng, hz, time, clouds=True, sun_side=None):
         my = rng.u(250, 330)
         if clouds:
             for k in range(rng.i(1, 3)):
-                cx, cy = rng.u(150, 670), rng.u(330, hz - 120)
+                cx, cy = rng.u(150, 670), rng.u(330, max(330, hz - 120))
                 with material('nuage'):
                     cloud(sc, rng, cx, cy, rng.u(200, 380), rng.u(30, 60), d=0.3, top=0.8, under=0.48, tiers=2)
         moon(sc, mx, my, rng.u(22, 30))
@@ -58,7 +58,7 @@ def heavens(sc, rng, hz, time, clouds=True, sun_side=None):
         if clouds:
             for k in range(rng.i(2, 4)):
                 with material('nuage'):
-                    cloud(sc, rng, rng.u(140, 680), rng.u(250, hz - 140), rng.u(220, 420), rng.u(36, 90), d=rng.u(0.1, 0.5), top=1.0, under=0.6, tiers=2)
+                    cloud(sc, rng, rng.u(140, 680), rng.u(250, max(250, hz - 140)), rng.u(220, 420), rng.u(36, 90), d=rng.u(0.1, 0.5), top=1.0, under=0.6, tiers=2)
         sun(sc, sx, sy, rng.u(26, 34))
         meta['sun'] = (sx, sy)
         return meta
@@ -68,7 +68,7 @@ def heavens(sc, rng, hz, time, clouds=True, sun_side=None):
     if clouds:
         for k in range(rng.i(2, 4)):
             with material('nuage'):
-                cloud(sc, rng, rng.u(140, 680), rng.u(250, hz - 130), rng.u(240, 460), rng.u(50, 140), d=rng.u(0.1, 0.6), top=0.99, under=0.74, tiers=rng.i(2, 4))
+                cloud(sc, rng, rng.u(140, 680), rng.u(250, max(250, hz - 130)), rng.u(240, 460), rng.u(50, 140), d=rng.u(0.1, 0.6), top=0.99, under=0.74, tiers=rng.i(2, 4))
     if rng.u() < 0.45:
         sx, sy = rng.u(520, 690), rng.u(240, 330)
         sun(sc, sx, sy, rng.u(24, 32))
@@ -247,7 +247,7 @@ def vallee_de_joux(sc, rng, year, time):
     meta = heavens(sc, rng, hz, time, clouds=rng.u() < 0.5)
     flip = rng.u() < 0.5
     dent = rng.u(560, 700) if not flip else rng.u(120, 260)
-    mountains(sc, rng, hz, [(dent, 150, 120), (W - dent, 70, 330)], d=0.55, v_lit=0.86, v_sh=0.66, snow=0.9)
+    mountains(sc, rng, hz, [(dent, 150, 120), (W - dent, 70, 330)], d=0.55, v_lit=0.86, v_sh=0.66, snow=0.9, slant=0.3, rough=0.1)
     forest(sc, rng, -10, W + 10, hz - 4, 24, 40, d=0.6, snow=True, rows=2, density=1.3)
     with material('neige'):
         lake = ((YY > hz + 30) & (YY < hz + 84)).astype(np.float32)
@@ -295,7 +295,7 @@ def chaux_de_fonds(sc, rng, year, time):
     hz = int(rng.u(330, 380))
     meta = heavens(sc, rng, hz, time, clouds=rng.u() < 0.6)
     snow = rng.u() < 0.35
-    mountains(sc, rng, hz + 30, [(rng.u(100, 300), 90, 320), (rng.u(520, 760), 70, 300)], d=0.55, v_lit=0.66, v_sh=0.5, snow=0.9 if snow else 0.0)
+    mountains(sc, rng, hz + 30, [(rng.u(100, 300), 90, 320), (rng.u(520, 760), 70, 300)], d=0.55, v_lit=0.66, v_sh=0.5, snow=0.9 if snow else 0.0, slant=0.2, rough=0.04)
     forest(sc, rng, -10, W + 10, hz + 20, 18, 30, d=0.55, snow=snow, rows=2)
     (snowfield if snow else meadow)(sc, rng, hz + 40, H)
     lights = []
@@ -341,7 +341,7 @@ def le_locle(sc, rng, year, time):
     hz = int(rng.u(520, 580))
     meta = heavens(sc, rng, hz, time)
     snow = rng.u() < 0.35
-    mountains(sc, rng, hz + 20, [(rng.u(80, 200), 150, 260), (rng.u(620, 760), 170, 280)], d=0.45, v_lit=0.62, v_sh=0.46, snow=0.9 if snow else 0.0)
+    mountains(sc, rng, hz + 20, [(rng.u(80, 200), 120, 300), (rng.u(620, 760), 135, 320)], d=0.45, v_lit=0.62, v_sh=0.46, snow=0.9 if snow else 0.0, slant=0.2, rough=0.04)
     forest(sc, rng, -10, 300, hz + 10, 30, 46, d=0.45, snow=snow, rows=2)
     forest(sc, rng, 520, W + 10, hz + 10, 30, 46, d=0.45, snow=snow, rows=2)
     (snowfield if snow else meadow)(sc, rng, hz + 60, H)
@@ -402,7 +402,7 @@ def bienne(sc, rng, year, time):
     le lac ; les fabriques d'horlogerie à partir du milieu du XIXe siècle."""
     hz = int(rng.u(560, 610))
     meta = heavens(sc, rng, hz, time)
-    mountains(sc, rng, hz + 20, [(rng.u(150, 330), 230, 380), (rng.u(560, 760), 200, 320)], d=0.4, v_lit=0.6, v_sh=0.45, snow=0.0)
+    mountains(sc, rng, hz + 20, [(rng.u(150, 330), 170, 440), (rng.u(560, 760), 150, 400)], d=0.4, v_lit=0.6, v_sh=0.45, snow=0.0, slant=0.2, rough=0.04)
     forest(sc, rng, -10, W + 10, hz + 18, 24, 36, d=0.45, rows=2)
     meadow(sc, rng, hz + 24, H)
     lights = []
@@ -467,7 +467,7 @@ def glashutte(sc, rng, year, time):
     hz = int(rng.u(500, 560))
     meta = heavens(sc, rng, hz, time)
     snow = rng.u() < 0.3
-    mountains(sc, rng, hz + 40, [(rng.u(60, 220), 200, 320), (rng.u(600, 780), 220, 330)], d=0.45, v_lit=0.6, v_sh=0.44, snow=0.95 if snow else 0.0)
+    mountains(sc, rng, hz + 40, [(rng.u(60, 220), 120, 340), (rng.u(600, 780), 130, 350)], d=0.45, v_lit=0.6, v_sh=0.44, snow=0.95 if snow else 0.0, slant=0.2, rough=0.04)
     forest(sc, rng, -10, 330, hz + 40, 26, 42, d=0.45, snow=snow, rows=2)
     forest(sc, rng, 520, W + 10, hz + 40, 26, 42, d=0.45, snow=snow, rows=2)
     (snowfield if snow else meadow)(sc, rng, hz + 50, H)

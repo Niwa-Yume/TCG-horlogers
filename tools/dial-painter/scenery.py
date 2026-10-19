@@ -76,17 +76,18 @@ def smoke(sc, rng, x, y, h, d=0.3, drift=0.6, v=0.82):
 
 # ───────────────────────────── relief ─────────────────────────────
 
-def mountains(sc, rng, base, peaks, d=0.7, v_lit=0.86, v_sh=0.66, snow=0.45, slant=0.6):
+def mountains(sc, rng, base, peaks, d=0.7, v_lit=0.86, v_sh=0.66, snow=0.45, slant=0.6, rough=0.22):
     """Chaîne de montagnes : peaks = [(x, hauteur, demi-largeur)]. Profil en bosses arrondies,
     arêtes secondaires en bruit « ridged » ; un versant est éclairé là où le profil monte vers
     la droite (lumière à gauche), à l'ombre là où il descend ; les facettes suivent des arêtes
-    qui descendent en biais. Neige au-dessus d'une ligne irrégulière (snow = part enneigée)."""
+    qui descendent en biais. Neige au-dessus d'une ligne irrégulière (snow = part enneigée).
+    rough : poids des arêtes (0,22 les Alpes ; 0,04 les croupes arrondies du Jura ou de l'Erzgebirge)."""
     xs = np.arange(W, dtype=np.float32)
     env = np.zeros(W, np.float32)
     for px, ph, pw in peaks:
         env = np.maximum(env, ph * np.clip(1 - ((xs - px) / pw) ** 2, 0, 1) ** 0.9)
     ridged = 1 - np.abs(fbm(rng, 70, 3, h=1, w=W)[0] * 2 - 1)
-    prof = ndi.gaussian_filter1d(env * (0.84 + 0.22 * ridged), 2.5) + (fbm(rng, 10, 2, h=1, w=W)[0] - 0.5) * 4 * (env > 4)
+    prof = ndi.gaussian_filter1d(env * (1.06 - rough + rough * ridged), 2.5) + (fbm(rng, 10, 2, h=1, w=W)[0] - 0.5) * 4 * (env > 4)
     top = base - prof
     m = smooth(-1.2, 1.2, YY - top[None, :]) * (YY < base + 3)
     # pente du profil, lue le long d'arêtes qui descendent en biais
@@ -95,7 +96,7 @@ def mountains(sc, rng, base, peaks, d=0.7, v_lit=0.86, v_sh=0.66, snow=0.45, sla
     xi = np.clip(XX - depth * slant, 0, W - 1).astype(np.int32)
     slope = dprof[xi]
     lit = smooth(-0.15, 0.25, slope)
-    folds = (fbm(rng, 20, 3, aspect=0.4) - 0.5) * 0.14
+    folds = (fbm(rng, 20, 3, aspect=0.4) - 0.5) * 0.14 * max(rough / 0.22, 0.35)
     v = v_sh + (v_lit - v_sh) * lit + folds - 0.08 * smooth(0, 160, depth)
     with material('montagne'):
         sc.put(m, air(v, d), flow=np.where(lit > 0.5, -0.9, 0.9), fw=0.55, ln=0.9)

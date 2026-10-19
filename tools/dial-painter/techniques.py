@@ -172,6 +172,9 @@ def render(sc, technique, rng, meta):
 
     if technique == 'MARQUETERIE':
         L = sc.lum().copy()
+        # zones de texte : bois clair sous la marque (encre foncée), bois sombre sous la légende (encre claire)
+        L = L + (0.8 - L) * 0.6 * (1 - smooth(150, 240, YY))
+        L = L * (1 - 0.55 * smooth(880, 970, YY))
         sky = sc.mat == MAT['ciel']
         cuts = wedge = flow_over = None
         sun = meta.get('sun')
