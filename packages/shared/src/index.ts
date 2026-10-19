@@ -199,3 +199,35 @@ export interface CollectionView {
 
 /** Siècle d'une année (1755 → 18), ou 0 si inconnue. */
 export const centuryOf = (year: number | null) => (year == null ? 0 : Math.floor((year - 1) / 100) + 1);
+
+// ---------- Duel (Phase 3) : ce que le serveur envoie à chaque joueur ----------
+
+export const DUEL_WIN_RUBIS = 10; // victoire contre un joueur ; rien contre l'automate
+export const DUEL_REACTIONS = 6;
+
+export interface DuelPlayerInfo {
+  name: string;
+  rating: number;
+  bot: boolean;
+  connected: boolean;
+  /** Déconnecté : limite de reconnexion, sinon défaite. */
+  reconnectBy: string | null;
+}
+
+export interface DuelPayload {
+  id: string;
+  ranked: boolean;
+  view: import('@wm/engine').DuelView;
+  /** Fin du choix (30 s) ou de la question (10 s). */
+  deadline: string | null;
+  /** La révélation reste à l'écran jusque-là ; le minuteur part ensuite. */
+  pauseUntil: string | null;
+  me: DuelPlayerInfo;
+  opponent: DuelPlayerInfo;
+  /** Ma main et les cartes posées, localisées. */
+  cards: Record<string, CardView>;
+  /** Ma question en cours, sans la réponse. */
+  question: { prompt: string; choices: string[] } | null;
+  events: import('@wm/engine').DuelEvent[];
+  result: { ratingDelta: number; rubis: number } | null;
+}
