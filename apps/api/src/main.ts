@@ -10,7 +10,7 @@ import { DuelController } from './duel/duel.controller';
 import { DuelServer } from './duel/server';
 import { MarketController } from './market/market.controller';
 import { sweep } from './market/market';
-import { actionLimit } from './market/ratelimit';
+import { actionLimit, purgeCounts } from './market/ratelimit';
 import { PlayerController } from './player.controller';
 import { PrismaService } from './prisma';
 import { SessionService } from './session';
@@ -33,14 +33,16 @@ class AppModule {}
 setupPassport();
 const app = await NestFactory.create<NestExpressApplication>(AppModule);
 app.setGlobalPrefix('api');
-app.use(actionLimit);
+app.use(actionLimit(app.get(PrismaService)));
 app.use(passport.initialize());
 app.set('trust proxy', 1); // derrière Caddy
 app.enableShutdownHooks();
 new DuelServer(app.get(PrismaService)).attach(app.getHttpServer());
 // enchères échues et échanges expirés : réglés toutes les 30 s (et à chaque lecture du marché)
-setInterval(
-  () => void sweep(app.get(PrismaService)).catch((e) => console.error('marché : ménage impossible', e)),
-  30_000,
-);
+// Chaque processus API fait ce ménage : les verrous de ligne et la vérification du statut rendent
+// le règlement idempotent, deux processus ne règlent jamais deux fois la même enchère.
+setInterval(() => {
+  const db = app.get(PrismaService);
+  void Promise.all([sweep(db), purgeCounts(db)]).catch((e) => console.error('marché : ménage impossible', e));
+}, 30_000);
 await app.listen(Number(process.env.PORT ?? 3000));
