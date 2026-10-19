@@ -177,6 +177,8 @@ export interface MeView {
   boostersOpened: number;
   dailyAvailable: boolean;
   providers: string[];
+  /** Compte : date à partir de laquelle on peut vendre et échanger ; null pour un invité. */
+  sellableAt: string | null;
 }
 
 export interface PulledCard extends CardView {
@@ -190,7 +192,8 @@ export interface PullView {
 }
 
 export interface CollectionView {
-  owned: { card: CardView; count: number; instanceId: string }[];
+  /** `locked` : exemplaires en vente ou en échange (ni recyclables, ni jouables). */
+  owned: { card: CardView; count: number; locked: number; instanceId: string }[];
   /** Taille du catalogue par type et par siècle, pour les barres de progression. */
   byType: Partial<Record<CardType, number>>;
   byCentury: Record<string, number>;
@@ -230,4 +233,49 @@ export interface DuelPayload {
   question: { prompt: string; choices: string[] } | null;
   events: import('@wm/engine').DuelEvent[];
   result: { ratingDelta: number; rubis: number } | null;
+}
+
+// ---------- Marché (Phase 4) ----------
+
+export const AUCTION_HOURS = 24; // durée fixe
+export const AUCTION_TAX = 0.05; // brûlée à la vente
+export const TRADE_HOURS = 48;
+export const ACTIONS_PER_MINUTE = 30;
+/** Délai par défaut entre l'inscription et la première vente (SELL_DELAY_HOURS côté serveur). */
+export const SELL_DELAY_HOURS = 72;
+
+/** Taxe brûlée sur une vente, arrondie au Rubis supérieur. */
+export const auctionTax = (price: number) => Math.ceil(price * AUCTION_TAX);
+
+/** Prix de départ minimal : jamais moins que ce que rapporte le recyclage, et 10 Rubis au moins. */
+export const minStartPrice = (rarity: Rarity) => Math.max(10, RECYCLE_RUBIS[rarity]);
+
+/** Mise minimale suivante : le prix de départ, puis +5 % (1 Rubis au moins). */
+export const nextMinBid = (startPrice: number, bestBid: number | null) =>
+  bestBid == null ? startPrice : bestBid + Math.max(1, Math.ceil(bestBid * 0.05));
+
+export interface AuctionView {
+  id: string;
+  card: CardView;
+  seller: string;
+  mine: boolean;
+  startPrice: number;
+  bestBid: number | null;
+  /** Je suis le meilleur enchérisseur. */
+  leading: boolean;
+  bids: number;
+  minBid: number;
+  endsAt: string;
+  status: 'OPEN' | 'SOLD' | 'EXPIRED' | 'CANCELLED';
+}
+
+export interface TradeView {
+  id: string;
+  from: string;
+  to: string;
+  incoming: boolean;
+  offer: (CardView & { instanceId: string })[];
+  ask: (CardView & { instanceId: string })[];
+  status: 'PENDING' | 'DONE' | 'DECLINED' | 'CANCELLED' | 'EXPIRED';
+  expiresAt: string;
 }

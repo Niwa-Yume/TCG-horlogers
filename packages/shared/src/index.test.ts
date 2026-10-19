@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+  auctionTax,
+  minStartPrice,
+  nextMinBid,
   BOOSTER_ODDS,
   CRITERIA,
   STAT_BUDGET,
@@ -67,4 +70,14 @@ describe('boosterState', () => {
 
 it('siècles', () => {
   expect([centuryOf(1755), centuryOf(1800), centuryOf(1801), centuryOf(null)]).toEqual([18, 18, 19, 0]);
+});
+
+describe('marché', () => {
+  it('taxe de 5 % arrondie au supérieur, mise minimale +5 %', () => {
+    expect([auctionTax(100), auctionTax(101), auctionTax(10)]).toEqual([5, 6, 1]);
+    expect([nextMinBid(50, null), nextMinBid(50, 50), nextMinBid(50, 10), nextMinBid(50, 200)]).toEqual([
+      50, 53, 11, 210,
+    ]);
+    expect([minStartPrice('GRAVURE'), minStartPrice('GRAND_FEU')]).toEqual([10, 150]);
+  });
 });
