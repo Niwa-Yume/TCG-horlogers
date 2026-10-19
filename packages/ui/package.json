@@ -1,0 +1,23 @@
+{
+  "name": "@wm/ui",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./tokens.css": "./src/tokens.css"
+  },
+  "scripts": {
+    "typecheck": "tsc -p ."
+  },
+  "peerDependencies": {
+    "react": "^19",
+    "react-i18next": "^15"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "react": "^19.2.0",
+    "react-i18next": "^15.7.4",
+    "i18next": "^25.10.10",
+    "vite": "^7.1.0"
+  }
+}

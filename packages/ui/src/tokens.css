@@ -1,0 +1,158 @@
+/* WristMasters — papier, encre, un seul accent. L'or, la couleur et la lumière sont réservés aux cartes. */
+:root {
+  --paper: #f2ecdf;
+  --ink: #121114;
+  --ink-muted: #4e4943; /* texte secondaire, AA sur --paper */
+  --steel-blue: #213a9c; /* seul accent : aiguilles bleuies */
+  --night: #121114; /* sections inversées : fond --night, texte --paper */
+  --night-muted: #cfc8bb;
+  --night-rule: #5c574f;
+  --rule: 1px solid var(--ink);
+
+  --font-display: 'Big Shoulders', 'Arial Narrow', sans-serif; /* 900, capitales */
+  --font-ui: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: 'Instrument Serif', 'Times New Roman', serif; /* titres éditoriaux des maquettes */
+  --font-figures: 'JetBrains Mono', ui-monospace, monospace;
+  --font-card-title: 'IM Fell English', 'Iowan Old Style', Georgia, serif;
+
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 16px;
+  --s4: 24px;
+  --s5: 40px;
+  --s6: 64px;
+
+  --t-micro: 150ms;
+  --t-screen: 380ms;
+  --t-reveal: 1000ms;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-spring: cubic-bezier(0.2, 1.3, 0.35, 1); /* cartes : physique, ressort */
+
+  /* Échelle fluide */
+  --fs-body: 16px;
+  --fs-lead: clamp(16px, 1.3vw, 18px);
+  --fs-mono: 13px;
+  --fs-h1: clamp(52px, 6vw, 88px);
+  --fs-serif: clamp(40px, 4.6vw, 66px);
+  --fs-marquee: clamp(84px, 13.5vw, 214px);
+  --fs-giant: 16vw; /* maquette : 20.5vw, qui rognait le mot ; 16vw le tient bord à bord */
+
+  --gutter: clamp(20px, 2.8vw, 40px);
+  --max: 1360px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+}
+
+a {
+  color: var(--ink);
+}
+a:hover {
+  color: var(--steel-blue);
+}
+:focus-visible {
+  outline: 2px solid var(--steel-blue);
+  outline-offset: 3px;
+}
+.wm-night :focus-visible {
+  outline-color: var(--paper);
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+  border-radius: 0;
+}
+
+/* Typographie */
+.wm-display {
+  font-family: var(--font-display);
+  font-weight: 900;
+  line-height: 0.86;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+.wm-mono {
+  font-family: var(--font-figures);
+  font-size: var(--fs-mono);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+.wm-serif {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  line-height: 1.05;
+}
+.wm-muted {
+  color: var(--ink-muted);
+}
+.wm-night {
+  background: var(--night);
+  color: var(--paper);
+}
+.wm-night .wm-muted {
+  color: var(--night-muted);
+}
+
+/* Grille : 4 colonnes mobile, 12 colonnes ordinateur, filets de 1 px */
+.wm-wrap {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+}
+.wm-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--s3);
+}
+@media (min-width: 900px) {
+  .wm-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--s4);
+  }
+}
+
+.wm-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
