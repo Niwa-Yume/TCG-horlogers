@@ -134,3 +134,68 @@ export function computeStats(slug: string, type: CardType, rarity: Rarity): Stat
   }
   return stats;
 }
+
+// ---------- Boosters et économie (Phase 2) ----------
+
+export const BOOSTER_SIZE = 5;
+export const BOOSTER_MAX = 10;
+export const BOOSTER_PERIOD_MS = 10 * 60_000;
+/** Le premier booster d'un joueur contient au moins cette rareté. */
+export const FIRST_BOOSTER_GUARANTEE: Rarity = 'GRISAILLE';
+/** Rubis gagnés en recyclant un doublon. */
+export const RECYCLE_RUBIS: Record<Rarity, number> = {
+  GRAVURE: 5,
+  MARQUETERIE: 10,
+  GRISAILLE: 25,
+  CLOISONNE: 60,
+  GRAND_FEU: 150,
+};
+export const DAILY_RUBIS = 20;
+
+export const rarityRank = (r: Rarity) => RARITIES.indexOf(r);
+
+/**
+ * Recharge calculée à la lecture, jamais par cron : un booster toutes les 10 min jusqu'à 10.
+ * `refill` est l'ancre du prochain booster ; elle ne court pas quand le stock est plein.
+ */
+export function boosterState(stock: number, refill: Date, now: Date) {
+  const n = Math.max(0, Math.floor((now.getTime() - refill.getTime()) / BOOSTER_PERIOD_MS));
+  const s = Math.min(BOOSTER_MAX, stock + n);
+  if (s >= BOOSTER_MAX) return { stock: BOOSTER_MAX, refill: now, nextAt: null };
+  const anchor = new Date(refill.getTime() + n * BOOSTER_PERIOD_MS);
+  return { stock: s, refill: anchor, nextAt: new Date(anchor.getTime() + BOOSTER_PERIOD_MS) };
+}
+
+export interface MeView {
+  /** false : aucune session encore (la session invitée naît au premier booster). */
+  exists: boolean;
+  isGuest: boolean;
+  displayName: string | null;
+  rubis: number;
+  stock: number;
+  nextAt: string | null;
+  boostersOpened: number;
+  dailyAvailable: boolean;
+  providers: string[];
+}
+
+export interface PulledCard extends CardView {
+  instanceId: string;
+  duplicate: boolean;
+}
+
+export interface PullView {
+  cards: PulledCard[]; // de la moins rare à la plus rare
+  me: MeView;
+}
+
+export interface CollectionView {
+  owned: { card: CardView; count: number; instanceId: string }[];
+  /** Taille du catalogue par type et par siècle, pour les barres de progression. */
+  byType: Partial<Record<CardType, number>>;
+  byCentury: Record<string, number>;
+  catalogue: number;
+}
+
+/** Siècle d'une année (1755 → 18), ou 0 si inconnue. */
+export const centuryOf = (year: number | null) => (year == null ? 0 : Math.floor((year - 1) / 100) + 1);
