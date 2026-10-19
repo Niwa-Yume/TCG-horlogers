@@ -87,6 +87,8 @@ model User {
   boosterRefill DateTime       @default(now())
   rating        Int            @default(1000)
   tutorialDone  Boolean        @default(false)
+  boostersOpened Int           @default(0) // le premier booster garantit une Grisaille au moins
+  lastDaily     DateTime? // dernière récompense quotidienne
   createdAt     DateTime       @default(now())
   cards         CardInstance[]
   decks         Deck[]
