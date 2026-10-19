@@ -4,8 +4,9 @@ Jeu de cartes à collectionner en ligne, 100 % horlogerie, bilingue FR/EN, mobil
 Le brief complet est dans [`BRIEF_CLAUDE_CODE.md`](BRIEF_CLAUDE_CODE.md), son résumé dans [`CLAUDE.md`](CLAUDE.md),
 les maquettes de référence dans [`design/`](design).
 
-État : **Phase 2 terminée** (premier contact sans compte, remontage et sonnerie, boosters et collection, connexion
-Google/Discord, partage). Phase 1 : design system, catalogue, cartes, loupe, ingestion, questions, admin.
+État : **Phase 3 terminée** (duel en direct : moteur pur, Socket.IO, automate, reconnexion, Elo, duel
+d'entraînement). Phase 2 : premier contact sans compte, remontage et sonnerie, boosters et collection, connexion
+Google/Discord, partage. Phase 1 : design system, catalogue, cartes, loupe, ingestion, questions, admin.
 
 ## Démarrer en local
 
@@ -26,6 +27,8 @@ pnpm dev                # api :3000 + web :5173
 - Catalogue : http://localhost:5173/catalogue
 - Fiche carte et loupe : http://localhost:5173/carte/tourbillon
 - Page de partage (Open Graph) : http://localhost:5173/partage/c/tourbillon
+- Duel en direct (5 cartes différentes au moins) : http://localhost:5173/duel
+- Duel d'entraînement (sans compte, sans minuteur) : http://localhost:5173/duel/tutoriel
 - Design system et les cinq raretés : http://localhost:5173/systeme
 - Admin (jeton `ADMIN_TOKEN` du `.env`) : http://localhost:5173/admin
 
@@ -46,7 +49,7 @@ caddy (front statique, cadrans et sons, HTTPS automatique, `/api/*` → api, `ST
 | Commande | Rôle |
 |---|---|
 | `pnpm dev` | API (tsx watch) + front (Vite) |
-| `pnpm test` | Vitest : rareté, stats, recharge des boosters, tirage, QCM, overrides, plages de planches |
+| `pnpm test` | Vitest : moteur de duel, automate, Elo, rareté, stats, recharge des boosters, tirage, QCM, overrides, plages de planches |
 | `pnpm --filter @wm/api test:db` | idem + test d'intégration du rattachement invité → compte (base requise) |
 | `pnpm typecheck` / `pnpm lint` / `pnpm format` | TypeScript strict, ESLint, Prettier |
 | `pnpm ingest` | Wikidata + Wikipédia + consultations → `packages/ingest/data/cards.generated.json` (cache dans `packages/ingest/.cache`) |
@@ -89,15 +92,28 @@ Créer le site dans Umami (`STATS_DOMAIN`), puis renseigner `VITE_UMAMI_WEBSITE_
 
 ```
 apps/web            React + Vite : accueil, remontage, album, catalogue, fiche carte + loupe, design system, admin
-apps/api            NestJS (REST) : cartes, admin, session et connexion, boosters, collection, partage ; seed
+apps/api            NestJS (REST) : cartes, admin, session et connexion, boosters, collection, partage, duel ; seed
+                    + Socket.IO sur /api/socket.io : file, parties, minuteurs, automate, reconnexion
 packages/ui         tokens, typo, grille, Marquee, SectionLabel, Counter, Button, Chip, StepTimer, Balance, MuteButton, SoundCaption, gestionnaire de sons
 packages/card-render <Card />, <FluidCard />, <Loupe />, <BoosterBack />, thèmes de rareté, cardSvg() pour resvg
 packages/shared     types, rareté par percentiles, tirage, budgets de stats, PRNG déterministe
 packages/ingest     ingestion, QCM, flagship.overrides.json, data/cards.generated.json
-packages/engine     Phase 3
+packages/engine     moteur de duel pur (init, step, viewFor), automate, Elo
 tools/dial-painter  peintre de cadrans (Python), plates.json
 prisma/             schéma et migrations
 ```
+
+## Mesures (fin de Phase 3)
+
+Lighthouse 12, mobile simulé, build de production servi par Caddy, 19 octobre 2026 :
+
+| Page | Performance | Accessibilité | Bonnes pratiques | LCP | CLS |
+|---|---|---|---|---|---|
+| `/` accueil | 97 | 100 | 100 | 2,3 s | 0,071 |
+| `/duel` | 97 | 100 | 100 | 2,4 s | 0 |
+| `/duel/tutoriel` | 97 | 100 | 100 | 2,3 s | 0 |
+
+JavaScript initial : 166 Ko gzip ; le duel en direct (Socket.IO compris) se charge à part : 15 Ko gzip.
 
 ## Mesures (fin de Phase 2)
 
@@ -171,3 +187,28 @@ reste à mesurer sur un téléphone moyen.
 - **Navigation** : en dessous de 900 px, barre de jeu en bas (Remonter, Album, Catalogue, Duel « bientôt ») comme
   dans `Album.dc.html` ; le Duel et les Enchères ne sont pas des liens tant qu'ils n'existent pas.
 - **Accueil** : « Cinq cents cartes » de la maquette remplacé par le nombre réel de cartes du catalogue.
+
+### Phase 3
+
+- **Moteur** (`packages/engine`, sans dépendance) : `init`, `step(state, action) → { state, events }`, `viewFor`.
+  RNG mulberry32 dont l'état vit dans l'état du duel : même graine, même partie. Main de 5 tirée d'un deck de 10,
+  **recomplétée après chaque manche** (ce qui permet de rejouer des manches sans tomber à court). Sans choix à la
+  fin des 30 s : carte au hasard, 0 cran. Les crans engagés sont perdus.
+- **Question décisive** : lue comme « en cas d'égalité, et toujours à la manche à 2-2 ». Chaque joueur reçoit une
+  question vérifiée tirée sur sa propre carte (10 s) ; +2 si juste. Sans question vérifiée sur la carte, pas de bonus
+  possible ; si aucun des deux n'en a, on passe à la rareté, puis la manche est rejouée (non comptée).
+  Tant qu'aucune question n'est validée dans `/admin`, les questions ne tombent jamais.
+- **Serveur** : Socket.IO brut attaché au serveur HTTP de Nest (chemin `/api/socket.io`, donc couvert par Caddy et le
+  proxy Vite), session lue dans le cookie. Parties en mémoire (un seul processus API : à déplacer vers Redis si l'on
+  passe à plusieurs instances). 3,5 s de pause après chaque révélation avant que le minuteur ne reparte.
+- **Automate** (« Automate Jaquet-Droz ») après 20 s d'attente : meilleure carte sur le critère avec 20 % de hasard,
+  2 crans aux moments décisifs (un joueur à 2), sinon 1 cran une fois sur quatre ; bonne réponse 6 fois sur 10 ;
+  deck de mêmes raretés que le joueur, tiré au hasard dans le catalogue.
+- **Deck** : automatique, les 10 cartes distinctes les plus fortes du joueur ; 5 cartes différentes suffisent pour
+  jouer. Pas encore d'écran pour composer son deck.
+- **Elo** (K = 32) et **10 Rubis** au vainqueur seulement entre joueurs ; rien contre l'automate ni à l'entraînement.
+  Chaque partie est enregistrée (`Match`, journal des événements).
+- **Reconnexion** : 30 s, compte à rebours visible chez l'adversaire, sinon défaite. Un rechargement de page reprend la
+  partie en cours.
+- **Duel d'entraînement** : le moteur tourne dans le navigateur, critères imposés, tes cinq cartes phares contre cinq
+  Gravures, pas de minuteur. Ouvert à tous, sans compte ; événement Umami `tutorial_duel_finished`.

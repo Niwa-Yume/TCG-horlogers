@@ -6,6 +6,7 @@ COPY apps/web/package.json apps/web/
 COPY packages/shared/package.json packages/shared/
 COPY packages/ui/package.json packages/ui/
 COPY packages/card-render/package.json packages/card-render/
+COPY packages/engine/package.json packages/engine/
 RUN pnpm install --frozen-lockfile --filter @wm/web... --filter wristmasters-tcg --ignore-scripts
 COPY . .
 ARG VITE_UMAMI_WEBSITE_ID=
