@@ -1,0 +1,86 @@
+.page {
+  padding-top: var(--s3);
+}
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+  border-bottom: var(--rule);
+  padding-bottom: var(--s2);
+}
+.bar h1 {
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+}
+.backLink {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+}
+.layout {
+  display: grid;
+  gap: var(--s5);
+  padding-top: var(--s3);
+}
+@media (min-width: 900px) {
+  .layout {
+    grid-template-columns: auto minmax(0, 52ch);
+    justify-content: center;
+    align-items: start;
+  }
+}
+.stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s3);
+}
+.hint {
+  max-width: 320px;
+  font-size: 14px;
+}
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+.found {
+  border: var(--rule);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: fade 0.45s var(--ease-out);
+}
+.found p {
+  font-size: 21px;
+  line-height: 1.2;
+}
+@keyframes fade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+.hidden {
+  border: 1px dashed var(--ink);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--ink-muted);
+}
+.summary {
+  font-size: var(--fs-lead);
+  max-width: 60ch;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+}

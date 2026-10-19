@@ -1,0 +1,99 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+  padding-top: var(--s5);
+}
+.page h1 {
+  font-size: var(--fs-h1);
+}
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.login {
+  max-width: 420px;
+}
+.tabs {
+  display: flex;
+  gap: 6px;
+}
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.field input,
+.field select,
+.field textarea,
+.choice input:not([type='radio']) {
+  min-height: 44px;
+  padding: 8px 12px;
+  border: var(--rule);
+  background: transparent;
+  width: 100%;
+}
+.question,
+.cardForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  max-width: 760px;
+  padding: var(--s3);
+  border: var(--rule);
+}
+.choices {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+.choice {
+  display: grid;
+  grid-template-columns: 24px 1fr 1fr;
+  gap: var(--s2);
+  align-items: center;
+}
+.choice input[type='radio'] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--steel-blue);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+.cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.cardRow {
+  border-bottom: var(--rule);
+  padding-block: var(--s2);
+}
+.cardRow[data-retired='true'] .cardName {
+  text-decoration: line-through;
+}
+.cardLine {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--s2) var(--s3);
+}
+@media (min-width: 900px) {
+  .cardLine {
+    grid-template-columns: 48px minmax(0, 1fr) auto auto auto;
+  }
+}

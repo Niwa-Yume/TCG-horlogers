@@ -1,0 +1,96 @@
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+  padding-block: var(--s5);
+}
+.title {
+  font-size: var(--fs-h1);
+}
+.kit {
+  border-top: var(--rule);
+  row-gap: 0;
+}
+.cell {
+  grid-column: span 4;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s3);
+  padding: var(--s4) 0;
+  border-bottom: var(--rule);
+}
+@media (min-width: 900px) {
+  .cell {
+    grid-column: span 6;
+  }
+}
+.cell h2,
+.block h2 {
+  font-weight: 500;
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.timer {
+  font-weight: 700;
+  font-size: clamp(48px, 6vw, 80px);
+  line-height: 1;
+}
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s4);
+  align-items: flex-start;
+}
+.fig {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+.night {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s5);
+  padding-block: 72px 80px;
+}
+.nightHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px 32px;
+}
+.nightHead p {
+  max-width: 56ch;
+  font-size: 15px;
+}
+.tiers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 28px 24px;
+}
+.tier {
+  margin: 0;
+  width: 252px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.tier figcaption {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-top: 1px solid var(--night-rule);
+  padding-top: 10px;
+  font-size: 13px;
+}
+.tierLine {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
