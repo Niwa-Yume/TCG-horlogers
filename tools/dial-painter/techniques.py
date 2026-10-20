@@ -200,6 +200,8 @@ def render(sc, technique, rng, meta):
     time = meta['time']
     if technique == 'CLOISONNE':
         col = colorize(sc, time, hz, levels=3)
+        # zones de texte (encre d'or) : zénith et premier plan dans les émaux sombres
+        col = col * (1 - 0.7 * (1 - smooth(150, 240, YY)) - 0.6 * smooth(880, 970, YY))[..., None]
         gold = (sc.mat == MAT['lumiere']).astype(np.float32)
         if meta.get('stars') is not None:
             gold = np.maximum(gold, meta['stars'])
@@ -209,6 +211,8 @@ def render(sc, technique, rng, meta):
 
     if technique == 'GRAND_FEU':
         col = colorize(sc, time, hz)
+        # la légende, en encre claire, repose sur un premier plan dans l'ombre
+        col = col * (1 - 0.55 * smooth(880, 970, YY))[..., None]
         if meta.get('stars') is not None:
             col = col * (1 - meta['stars'][..., None]) + col3('#FFF4D0') * meta['stars'][..., None]
         cs = Scene(0.5)
