@@ -56,7 +56,7 @@ caddy (front statique, cadrans et sons, HTTPS automatique, `/api/*` → api, `ST
 | `pnpm typecheck` / `pnpm lint` / `pnpm format` | TypeScript strict, ESLint, Prettier |
 | `pnpm ingest` | Wikidata + Wikipédia + consultations → `packages/ingest/data/cards.generated.json` (cache dans `packages/ingest/.cache`) |
 | `pnpm seed` | Upsert des cartes et des QCM ; ne touche ni au statut, ni aux overrides, ni aux questions relues |
-| `pnpm dials` | Regénère les 5 cadrans de référence (voir ci-dessous) |
+| `pnpm dials` | Peint les cadrans du catalogue (voir ci-dessous) ; les 5 cadrans de référence ne bougent pas |
 | `pnpm --filter @wm/api prisma <cmd>` | CLI Prisma avec le `.env` racine |
 
 ### Cadrans peints
@@ -64,12 +64,14 @@ caddy (front statique, cadrans et sons, HTTPS automatique, `/api/*` → api, `ST
 ```bash
 python3 -m venv tools/dial-painter/.venv
 tools/dial-painter/.venv/bin/pip install -r tools/dial-painter/requirements.txt
-tools/dial-painter/.venv/bin/python tools/dial-painter/render.py --all --jobs 5
-tools/dial-painter/.venv/bin/python tools/dial-painter/render.py --card tourbillon --out /tmp/dials   # sans écraser les références
-tools/dial-painter/.venv/bin/python tools/dial-painter/render.py --contact                            # planche de contact
+tools/dial-painter/.venv/bin/python tools/dial-painter/render.py --all --missing --jobs 8   # cadrans absents
+tools/dial-painter/.venv/bin/python tools/dial-painter/render.py --card rolex               # une carte
+tools/dial-painter/.venv/bin/python tools/dial-painter/render.py --contact --check          # planche de contact, contrôle
+pnpm seed                                                                                    # relie les nouveaux cadrans
 ```
 
-Sorties : `assets/dials/<nom>.webp` (816 px), `<nom>-408.webp` (srcset) et `<nom>.jpg` (partage). Voir
+Sorties : `assets/dials/<slug>.webp` (816 px), `<slug>-408.webp` (srcset) et `<slug>.jpg` (partage). Les cinq
+cadrans de référence ne sont regénérés que par `--reference`. Voir
 [`tools/dial-painter/README.md`](tools/dial-painter/README.md) et la fiche des planches `tools/dial-painter/plates.json`.
 
 ## Connexion Google et Discord
@@ -255,3 +257,33 @@ reste à mesurer sur un téléphone moyen.
   Active seulement avec `DEV_LOGIN=1` **et** une `PUBLIC_URL` en `http://` ; `docker-compose.yml` ne la transmet pas.
 - **Navigation** : la barre mobile suit la maquette de l'album (Remonter, Album, Duel, Enchères) ; le catalogue est
   accessible depuis l'album et l'en-tête sur ordinateur.
+
+### Phase 5
+
+- **Un cadran peint par carte** : 13 planches (Londres-Tamise, Paris-Cité, Genève-rade, Vallée de Joux,
+  La Chaux-de-Fonds, vallon jurassien, Neuchâtel, Bienne, Schaffhouse, Glashütte, en mer, l'établi, l'observatoire)
+  × 5 techniques (Gravure, Marqueterie, Grisaille, Cloisonné, Grand Feu, choisie par la rareté). La graine, tirée
+  du slug, fait varier point de vue, nuages, bateaux et passants ; l'année fait varier les monuments et les objets
+  (flèche de Notre-Dame, jet d'eau de Genève dès 1891, vapeurs dès 1823, observatoire de Neuchâtel dès 1858,
+  fabriques, costumes, paquebot sans vergues après 1910, lampe et régulateur de l'établi). Les cinq cartes phares
+  gardent leur cadran de référence. Relief juste : pics des Alpes derrière Genève et Neuchâtel, croupes boisées
+  arrondies pour le Jura et l'Erzgebirge.
+- **Lieu et année du cadran** (`packages/ingest/src/dials.ts`) : maison → lieu de fondation (P740) et année de
+  fondation ; siège seul (P159) → la ville **sans** année (le siège a pu déménager depuis) ; horloger → lieu de
+  travail (P937) vers 35 ans, de son vivant (« vers 1782 »), sinon ville natale (P19) l'année de naissance ;
+  invention → lieu de travail de son inventeur s'il est au catalogue ; montres de plongée et de marine → en mer.
+  Un **modèle ne prend pas le lieu de sa maison** : Rolex, fondée à Londres en 1905, est à Genève dès 1919, et
+  « Datejust — Londres, 1945 » serait faux. Une année hors de la plage de la planche (`plates.json`) donne l'établi.
+- **Sans année connue** (25 cartes, surtout des modèles sans date dans Wikidata) : jamais de ville peinte à une
+  époque inventée. L'établi sans régulateur, sans lampe ni montre-bracelet, ou la mer sans navire ; la légende
+  garde le lieu seul.
+- **L'établi plutôt qu'une fausse ville** : une ville sans planche (village natal, Pforzheim, Waltham, Tokyo…) n'a
+  pas de vue générique étiquetée à son nom ; la carte montre l'établi à la fenêtre et la légende garde le vrai
+  lieu. C'est 133 cartes sur 216, la limite visible de cette phase (voir les points à valider).
+- **Contrôle qualité** : `render.py --check` mesure le contraste des zones de texte (4,5:1 au moins, halo compté)
+  et le détail fin derrière le texte ; il échoue s'il reste un cadran illisible. Chaque technique réserve un fond
+  calme sous la marque et la légende (bois clair ou sombre, émail du zénith, premier plan dans l'ombre). La CI peint
+  les cadrans manquants, contrôle tout et publie la planche de contact, même en cas d'échec.
+- **Le seed** ne relie un cadran que si son fichier existe : une carte sans cadran garde l'émail uni.
+- **Images de partage** : elles étaient renvoyées en JSON (un `Buffer` sérialisé par Nest) depuis la Phase 2 ;
+  elles partent maintenant en PNG, cadran peint compris, et l'accroche passe sur deux lignes au lieu de déborder.
