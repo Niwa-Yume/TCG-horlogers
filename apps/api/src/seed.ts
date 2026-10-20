@@ -51,5 +51,7 @@ await db.$transaction(
   },
   { timeout: 120_000 },
 );
-console.log(`${cards.length} cartes, ${questions} questions à jour, ${missing} cadran(s) pas encore peint(s)`);
+console.log(
+  `${cards.length} cartes, ${questions} questions à jour, ${missing} cadran(s) pas encore peint(s)`,
+);
 await db.$disconnect();
