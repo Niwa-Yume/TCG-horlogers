@@ -508,7 +508,7 @@ def glashutte(sc, rng, year, time):
 
 def en_mer(sc, rng, year, time):
     """En mer : la houle, le soleil bas, un vaisseau de l'époque (voiles jusqu'en 1860,
-    vapeur ensuite), des goélands."""
+    vapeur gréé ensuite, paquebot sans vergues après 1910), des goélands."""
     hz = int(rng.u(700, 760))
     meta = heavens(sc, rng, hz, time if time != 'jour' else 'couchant')
     if rng.u() < 0.6:
@@ -517,10 +517,12 @@ def en_mer(sc, rng, year, time):
     with material('eau'):
         sea(sc, rng, hz, v_far=0.84 if time != 'nuit' else 0.5, v_near=0.5 if time != 'nuit' else 0.28, amp=0.9, sun=meta['sun'])
     with material('toile'):
-        if year < 1860:
+        if year is None:
+            pass  # sans année, pas de navire qui daterait la scène
+        elif year < 1860:
             ship_under_sail(sc, rng, rng.u(80, 200), hz + rng.u(150, 180), rng.u(380, 440), rng.u(480, 540), d=0.0, heel=-0.05)
         else:
-            steamship(sc, rng, rng.u(60, 160), hz + rng.u(150, 190), rng.u(500, 580), d=0.0)
+            steamship(sc, rng, rng.u(60, 160), hz + rng.u(150, 190), rng.u(500, 580), d=0.0, year=year)
     for k in range(rng.i(2, 5)):
         gull(sc, rng.u(450, 720), rng.u(380, 560), rng.u(0.7, 1.4))
     return meta
@@ -529,7 +531,9 @@ def en_mer(sc, rng, year, time):
 def etabli(sc, rng, year, time):
     """L'établi à la fenêtre : un mouvement ouvert, les brucelles, le tournevis, la loupe ;
     avant 1500, un astrolabe ; chandelle, lampe à huile ou lampe électrique selon l'époque ;
-    au mur, un régulateur (après 1680)."""
+    au mur, un régulateur (après 1680). Sans année connue, rien qui date la scène : ni régulateur,
+    ni lampe, ni montre-bracelet."""
+    known = year is not None
     meta = {'hz': 560, 'time': time, 'sun': None, 'stars': None}
     set_haze(0.9 if time != 'nuit' else 0.7)
     left = rng.u() < 0.5
@@ -571,7 +575,7 @@ def etabli(sc, rng, year, time):
         sc.put(sill, 0.84)
         sc.light(sill * (YY < wy1 + 12), 0.4)
     # régulateur au mur (horloge à balancier, après 1680)
-    if year >= 1680:
+    if known and year >= 1680:
         rx = (wx1 + 820) / 2 if left else wx0 / 2
         with material('bois'):
             case = lay(0.3).rect(rx - 46, 220, rx + 46, 600).arr()
@@ -598,7 +602,7 @@ def etabli(sc, rng, year, time):
     # l'objet : astrolabe avant 1500, sinon un mouvement de montre, platine et rouages
     cx, cy = (rng.u(420, 520) if left else rng.u(200, 320)), 812
     with material('metal'):
-        if year < 1500:
+        if known and year < 1500:
             r = 120
             sc.put(lay(0.2).ellipse(cx, cy - 10, r, r * 0.42).arr(), ramp_x(cx - r, cx + r, 0.86, 0.6))
             rings = lay(0.0)
@@ -611,7 +615,7 @@ def etabli(sc, rng, year, time):
         elif rng.u() < 0.45:
             # montre ouverte : boîte, cadran à index, aiguilles ; bracelet après 1910, sinon pendant et chaîne
             r = 96
-            wrist = year >= 1910 and rng.u() < 0.6
+            wrist = known and year >= 1910 and rng.u() < 0.6
             if wrist:
                 with material('bois'):
                     sc.put(lay(0.4).poly([(cx - r * 1.9, cy - 6), (cx - r * 0.7, cy - 18), (cx - r * 0.7, cy + 4), (cx - r * 1.9, cy + 14)]).arr(), 0.3, flow=0.0, fw=0.8)
@@ -666,7 +670,9 @@ def etabli(sc, rng, year, time):
     lx = rng.u(640, 740) if left else rng.u(70, 170)
     ly = 760
     with material('metal'):
-        if year < 1800:
+        if not known:
+            pass
+        elif year < 1800:
             sc.put(lay(0.2).ellipse(lx, ly, 40, 12).arr(), 0.6)
             sc.put(lay(0.2).rect(lx - 9, ly - 120, lx + 9, ly - 4).arr(), 0.92)
             fy, fx = ly - 136, lx
@@ -681,7 +687,7 @@ def etabli(sc, rng, year, time):
             sc.put(arm.arr(), 0.28)
             sc.put(lay(0.2).poly([(lx - d_ * 60, ly - 296), (lx - d_ * 130, ly - 310), (lx - d_ * 142, ly - 250), (lx - d_ * 90, ly - 248)]).arr(), 0.34)
             fy, fx = ly - 250, lx - d_ * 115
-    if time != 'jour':
+    if time != 'jour' and known:
         with material('lumiere'):
             flame = disc(fx, fy, 11 if year < 1800 else 16, 1.0)
             sc.put(flame, 1.0)
@@ -756,7 +762,7 @@ def render(plate, technique, seed, year):
 
 if __name__ == '__main__':
     args = [a for a in sys.argv[1:] if not a.startswith('--')]
-    plate, technique, seed, year, out = args[0], args[1], int(args[2]), int(args[3]), args[4]
+    plate, technique, seed, year, out = args[0], args[1], int(args[2]), None if args[3] == '-' else int(args[3]), args[4]
     if '--ref' in sys.argv:
         sc, meta, rng = build(plate, technique, seed, year)
         img = techniques.colorize(sc, meta['time'], meta['hz']) if '--color' in sys.argv else lut(np.clip(sc.lum(), 0, 1), techniques.SEPIA)

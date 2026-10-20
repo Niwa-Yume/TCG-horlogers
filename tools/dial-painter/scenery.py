@@ -388,9 +388,10 @@ def steamer(sc, rng, x, wl, L, d=0.2, rip=None, flip=1):
     smoke(sc, rng, fx, wl - hh * 2.3 - 36, 70, d, drift=-0.7 * flip, v=0.7)
 
 
-def steamship(sc, rng, x, wl, L, d=0.0, rip=None):
+def steamship(sc, rng, x, wl, L, d=0.0, rip=None, year=1880):
     """Vapeur de haute mer (après 1860) : coque noire à préceinte, superstructures blanches,
-    deux cheminées, deux mâts gréés ; fumée couchée par le vent."""
+    deux cheminées, deux mâts gréés ; fumée couchée par le vent. À partir de 1910, plus de
+    vergues (les voiles d'appoint ont disparu) et une seule cheminée."""
     G = Group()
     hh = L * 0.1
     with material('metal'):
@@ -407,7 +408,7 @@ def steamship(sc, rng, x, wl, L, d=0.0, rip=None):
     with material('vitre'):
         G.put(ports.arr(), air(0.8, d))
     funnels = []
-    for fx in (x + L * 0.45, x + L * 0.57):
+    for fx in (x + L * 0.45, x + L * 0.57) if year < 1910 else (x + L * 0.51,):
         with material('metal'):
             G.put(lay(0.2).poly([(fx - 9, wl - hh * 3.1), (fx + 9, wl - hh * 3.1), (fx + 7, wl - hh * 5.2), (fx - 11, wl - hh * 5.2)]).arr(), split(fx, air(0.4, d), air(0.24, d), 2))
             G.put(lay(0.2).rect(fx - 11.5, wl - hh * 5.2, fx + 7.5, wl - hh * 4.8).arr(), air(0.16, d))
@@ -416,7 +417,8 @@ def steamship(sc, rng, x, wl, L, d=0.0, rip=None):
     for mx in (x + L * 0.18, x + L * 0.82):
         with material('bois'):
             G.put(lay(0.0).line([(mx, wl - hh * 1.5), (mx, wl - L * 0.62)], 2.6).arr(), air(0.3, d))
-            G.put(lay(0.0).line([(mx - L * 0.07, wl - L * 0.48), (mx + L * 0.07, wl - L * 0.48)], 1.8).arr(), air(0.3, d))
+            if year < 1910:
+                G.put(lay(0.0).line([(mx - L * 0.07, wl - L * 0.48), (mx + L * 0.07, wl - L * 0.48)], 1.8).arr(), air(0.3, d))
         rig.line([(mx, wl - L * 0.62), (x + (L * 1.05 if mx > x + L / 2 else -L * 0.02), wl - hh * 1.6)], 0.7)
         rig.line([(mx, wl - L * 0.62), (x + L * 0.5, wl - hh * 3.1)], 0.6)
     G.ink(rig.arr(), 0.5)

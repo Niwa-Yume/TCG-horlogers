@@ -40,12 +40,12 @@ CARDS = {
 
 
 def catalogue():
-    """slug → (planche, rareté, graine, année) pour les cartes du catalogue."""
+    """slug → (planche, rareté, graine, année ou None) pour les cartes du catalogue."""
     try:
         cards = json.load(open(DATA))['cards']
     except FileNotFoundError:
         return {}
-    return {c['slug']: (c['plate'], c['rarity'], c['plateSeed'], c['dialYear'] or 1900)
+    return {c['slug']: (c['plate'], c['rarity'], c['plateSeed'], c['dialYear'])
             for c in cards if c.get('plate') and c['slug'] not in CARDS}
 
 
@@ -164,6 +164,8 @@ def main():
                 bad += 1
                 print(f'  {n:28s} {rar[n]:12s} ' + ' ; '.join(pb))
         print(f'contrôle : {bad} cadran(s) à revoir sur {sum(os.path.exists(os.path.join(a.out, n + ".webp")) for n in names)}')
+        if bad:
+            sys.exit(1)  # la CI échoue : un texte de carte ne se lirait pas
 
 
 if __name__ == '__main__':
