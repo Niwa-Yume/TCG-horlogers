@@ -39,19 +39,37 @@ it('maison dont on ne connaît que le siège actuel : la ville sans l’année',
 
 it('maison : lieu et année de fondation', () => {
   const d = assignDial(card({ year: 1839, placeFr: 'Genève', placeEn: 'Geneva' }), ranges);
-  expect(d).toMatchObject({ plate: 'geneve-rade', dialYear: 1839, dialPlaceFr: 'Genève, 1839', dialPlaceEn: 'Geneva, 1839' });
+  expect(d).toMatchObject({
+    plate: 'geneve-rade',
+    dialYear: 1839,
+    dialPlaceFr: 'Genève, 1839',
+    dialPlaceEn: 'Geneva, 1839',
+  });
 });
 
 it('horloger né quelque part : la ville natale l’année de sa naissance', () => {
-  const d = assignDial(card({ type: 'WATCHMAKER', year: 1747, yearEnd: 1823, placeFr: 'Neuchâtel', placeEn: 'Neuchâtel', birthplace: true }), {
-    ...ranges,
-    neuchatel: { from: 1700, to: 2100 },
-  });
+  const d = assignDial(
+    card({
+      type: 'WATCHMAKER',
+      year: 1747,
+      yearEnd: 1823,
+      placeFr: 'Neuchâtel',
+      placeEn: 'Neuchâtel',
+      birthplace: true,
+    }),
+    {
+      ...ranges,
+      neuchatel: { from: 1700, to: 2100 },
+    },
+  );
   expect([d.dialYear, d.dialPlaceFr]).toEqual([1747, 'Neuchâtel, 1747']);
 });
 
 it('horloger : sa ville de travail à 35 ans, « vers », jamais après sa mort', () => {
-  const d = assignDial(card({ type: 'WATCHMAKER', year: 1747, yearEnd: 1823, placeFr: 'Paris', placeEn: 'Paris' }), ranges);
+  const d = assignDial(
+    card({ type: 'WATCHMAKER', year: 1747, yearEnd: 1823, placeFr: 'Paris', placeEn: 'Paris' }),
+    ranges,
+  );
   expect(d.dialYear).toBe(1782);
   expect([d.dialPlaceFr, d.dialPlaceEn]).toEqual(['Paris, vers 1782', 'Paris, c. 1782']);
   expect(assignDial(card({ type: 'WATCHMAKER', year: 1800, yearEnd: 1820 }), ranges).dialYear).toBe(1820);
@@ -62,6 +80,16 @@ it('anachronisme : une année hors de la plage de la planche donne l’établi',
   expect(assignDial(card({ year: 1700, placeFr: 'Londres' }), ranges).plate).toBe('etabli');
 });
 
+it('année inconnue : l’établi sans date, le lieu seul en légende ; la mer reste la mer', () => {
+  const d = assignDial(card({ placeFr: 'Genève', placeEn: 'Geneva' }), ranges);
+  expect([d.plate, d.dialYear, d.dialPlaceFr]).toEqual(['etabli', null, 'Genève']);
+  expect(assignDial(card({ type: 'MODEL', nameFr: 'Rolex Submariner' }), ranges)).toMatchObject({
+    plate: 'en-mer',
+    dialYear: null,
+    dialPlaceFr: 'En mer',
+  });
+});
+
 it('montre de plongée en mer ; invention sans lieu à l’observatoire ; sinon l’établi, avec le pays', () => {
   expect(assignDial(card({ type: 'MODEL', nameFr: 'Rolex Submariner', year: 1953 }), ranges)).toMatchObject({
     plate: 'en-mer',
@@ -70,10 +98,16 @@ it('montre de plongée en mer ; invention sans lieu à l’observatoire ; sinon 
   expect(assignDial(card({ type: 'INVENTION', year: 1675 }), ranges).plate).toBe('observatoire');
   const d = assignDial(card({ year: 1881, placeFr: 'Tokyo', placeEn: 'Tokyo' }), ranges);
   expect([d.plate, d.dialPlaceFr]).toEqual(['etabli', 'Tokyo, 1881']);
-  expect(assignDial(card({ year: 1918, countryFr: 'Japon', countryEn: 'Japan' }), ranges).dialPlaceFr).toBe('Japon, 1918');
+  expect(assignDial(card({ year: 1918, countryFr: 'Japon', countryEn: 'Japan' }), ranges).dialPlaceFr).toBe(
+    'Japon, 1918',
+  );
 });
 
 it('graine stable par carte', () => {
-  expect(assignDial(card({ slug: 'a' }), ranges).plateSeed).toBe(assignDial(card({ slug: 'a' }), ranges).plateSeed);
-  expect(assignDial(card({ slug: 'a' }), ranges).plateSeed).not.toBe(assignDial(card({ slug: 'b' }), ranges).plateSeed);
+  expect(assignDial(card({ slug: 'a' }), ranges).plateSeed).toBe(
+    assignDial(card({ slug: 'a' }), ranges).plateSeed,
+  );
+  expect(assignDial(card({ slug: 'a' }), ranges).plateSeed).not.toBe(
+    assignDial(card({ slug: 'b' }), ranges).plateSeed,
+  );
 });

@@ -175,13 +175,18 @@ async function main() {
   }
 
   // 6. Cadrans peints : planche, graine, année et lieu de la scène (les cartes phares gardent les leurs)
-  const ranges = JSON.parse(await readFile(join(ROOT, '..', '..', 'tools', 'dial-painter', 'plates.json'), 'utf8')) as PlateRanges;
+  const ranges = JSON.parse(
+    await readFile(join(ROOT, '..', '..', 'tools', 'dial-painter', 'plates.json'), 'utf8'),
+  ) as PlateRanges;
   const byQid = new Map([...bySlug.values()].map((e) => [e.wikidataId, e]));
   for (const c of cards) {
     const e = bySlug.get(c.slug);
     if (c.isFlagship || !e) continue;
-    // un modèle prend le lieu de sa maison, une invention celui de son inventeur s'il est au catalogue
-    const via = e.placeFr ? e : e.entityId ? byQid.get(e.entityId) : undefined;
+    // une invention prend le lieu de travail de son inventeur s'il est au catalogue ; un modèle ne prend pas
+    // celui de sa maison, qui a pu déménager entre-temps (Rolex : fondée à Londres en 1905, à Genève dès 1919)
+    const inventor =
+      (e.type === 'INVENTION' || e.type === 'COMPLICATION') && e.entityId ? byQid.get(e.entityId) : undefined;
+    const via = e.placeFr ? e : inventor?.placeProp === 'P937' ? inventor : undefined;
     const dial = assignDial(
       {
         slug: c.slug,
@@ -214,7 +219,11 @@ async function main() {
       .join(', ');
   console.log(`${cards.length} cartes → ${OUT}\n  ${by('type')}\n  ${by('rarity')}`);
   console.log(`  ${cards.reduce((a, c) => a + c.questions.length, 0)} questions (non vérifiées)`);
-  console.log(`  planches : ${Object.entries(Object.groupBy(cards, (c) => c.plate ?? '—')).map(([p, l]) => `${p} ${l!.length}`).join(', ')}`);
+  console.log(
+    `  planches : ${Object.entries(Object.groupBy(cards, (c) => c.plate ?? '—'))
+      .map(([p, l]) => `${p} ${l!.length}`)
+      .join(', ')}`,
+  );
 }
 
 const emptyFacts = (): Facts => ({
