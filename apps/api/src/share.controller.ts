@@ -2,7 +2,17 @@
 // et page de partage avec balises Open Graph (/partage/… → /api/partage/… via Caddy ou Vite).
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { Controller, Get, Header, Inject, NotFoundException, Param, Query, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Header,
+  Inject,
+  NotFoundException,
+  Param,
+  Query,
+  Res,
+  StreamableFile,
+} from '@nestjs/common';
 import type { Response } from 'express';
 import { Resvg } from '@resvg/resvg-js';
 import { cardSvg, wrap } from '@wm/card-render/svg';
@@ -100,7 +110,11 @@ export async function renderShare(
       t(64 + 452, 118, 'TCG', mono(22)) +
       `<rect x="64" y="150" width="952" height="2" fill="${INK}"/>` +
       card(64, 200, 560, href) +
-      t(672, 270, who.slice(0, 34), mono(22)) +
+      // JetBrains Mono 22 : 13,2 px par signe, 26 signes tiennent entre x = 672 et la marge droite
+      wrap(who, 26)
+        .slice(0, 2)
+        .map((l, i) => t(672, 270 + i * 28, l, mono(22)))
+        .join('') +
       rarityLines.map((l, i) => t(668, 300 + rs + i * rs * 0.88, l, display(rs))).join('') +
       t(672, 340 + rs + rarityLines.length * rs * 0.88, rate, mono(24, STEEL)) +
       wrap(c.name, 18)
@@ -165,9 +179,10 @@ export class ShareController {
     const format = f === 'story' ? 'story' : 'square';
     const lang = langOf(l);
     const key = `${kind}/${id}/${format}/${lang}`;
-    if (cache.has(key)) return cache.get(key);
+    // StreamableFile : un Buffer renvoyé tel quel serait sérialisé en JSON par Nest
+    if (cache.has(key)) return new StreamableFile(cache.get(key)!);
     const { card, by } = await this.load(kind, id, lang);
-    return remember(key, await renderShare(card, format, lang, by));
+    return new StreamableFile(remember(key, await renderShare(card, format, lang, by)));
   }
 
   @Get('partage/:kind/:id')
